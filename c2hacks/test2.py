@@ -128,7 +128,7 @@ def add_cube(position):
         if power_node is None:
             global start
             power_node = cube
-            start = (cube.position.x + (5 - grid_shift_x), cube.position.y + (5 - grid_shift_y))
+            start = (cube.position.x + (10 - grid_shift_x), cube.position.y + (10 - grid_shift_y))
         else:
             destroy(cube)
             return
@@ -238,7 +238,7 @@ def reset_animation_flag():
 
 def analyze_nodes():
     global start
-    simulator = PF.SlimeMoldSimulator(grid_size=10, endpoints=nodes, obstacle=obstacles, start_coords=start)
+    simulator = PF.SlimeMoldSimulator(grid_size=20, endpoints=nodes, obstacle=obstacles, start_coords=start)
     simulator.run()
     simulator.plot()
 

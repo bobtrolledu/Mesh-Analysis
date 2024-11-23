@@ -7,16 +7,10 @@ obstacle, obstacles = [], []
 class SlimeMoldSimulator:
 
     def __init__(self, grid_size, endpoints, obstacle, start_coords):
-        self.obstacles = obstacles
-        self.end_pointCoords = end_pointCoords
+        self.end_pointCoords = [(i.position.x + 10, i.position.y + 10) for i in endpoints]
+        self.obstacles = [(i.position.x + 10, i.position.y + 10) for i in obstacle]
+        self.start = start_coords
         self.grid_size = grid_size + 1
-        self.endpoints = endpoints
-        for i in endpoints:
-            end_pointCoords.append((i.position.x, i.position.y + 5))
-
-        self.obstacle = obstacle
-        for i in obstacle:
-            obstacle_coords.append((i.position.x, i.position.y + 5))
 
         # Constants
         self.start_node_color = 'red'
@@ -27,7 +21,6 @@ class SlimeMoldSimulator:
 
         # Grid and nodes
         self.grid = [(x, y) for x in range(self.grid_size) for y in range(self.grid_size)]
-        self.start = start_coords
 
         self.paths = []
     '''
@@ -88,7 +81,7 @@ class SlimeMoldSimulator:
         """Run the slime mold simulation and find paths to all endpoints."""
         self.paths = []
         for end in self.end_pointCoords:
-            parent_map, found_end = self.slime_mold_algorithm(self.start, [end])
+            parent_map, found_end = self.slime_mold_algorithm(self.start, self.end_pointCoords)
             if parent_map:
                 path = self.reconstruct_path(parent_map, self.start, found_end)
                 self.paths.append(path)
