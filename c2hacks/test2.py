@@ -5,10 +5,10 @@ import random
 app = Ursina()
 
 cubes = []
+type = "low"
 
 pivot = Entity()
 pivot_rotate = Entity()
-
 camera.orthographic = True
 camera.fov = 15  # Controls the size of the orthographic view (adjust as needed)
 camera.parent = pivot
@@ -23,47 +23,38 @@ orthographic_locked = True
 is_animating = False
 zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
-def add_cube(position, type):
-    if type == "low":
-        cube = Entity(
-            model='cube',
-            color=color.random_color(),
-            position=position,
-            collider='box',  # Add a box collider for detecting mouse hover
-        )
-    elif type == "medium":
-        cube = Entity(
-            model='cube',
-            color=color.random_color(),
-            position=position,
-            collider='box',  # Add a box collider for detecting mouse hover
-            scale = (1,1,2)
-        )
-    elif type == "high":
-        cube = Entity(
-            model='cube',
-            color=color.random_color(),
-            position=position,
-            collider='box',  # Add a box collider for detecting mouse hover
-            scale = (1,1,3)
-        )
-    elif type == "commercial":
-        cube = Entity(
-            model='cube',
-            color=color.random_color(),
-            position=position,
-            collider='box',  # Add a box collider for detecting mouse hover
-            scale = (2,2,1)
-        )
-    elif type == "industrial":
-        cube = Entity(
-            model='cube',
-            color=color.random_color(),
-            position=position,
-            collider='box',  # Add a box collider for detecting mouse hover
-            scale = (2,2,2)
-        )
 
+def add_cube(position):
+    global type
+    size = (1, 1, 1)
+    current_color = color.green
+
+    if type == "low":
+        size = (1, 1, 1)
+        current_color = color.green
+    elif type == "medium":
+        size = (1, 1, 2)
+        current_color = color.yellow
+    elif type == "high":
+        size = (1, 1, 3)
+        current_color = color.orange
+    elif type == "commercial":
+        size = (2, 2, 1)
+        current_color = color.blue
+    elif type == "industrial":
+        size = (2, 2, 2)
+        current_color = color.red
+    elif type == "park":
+        size = (2, 2, 0.5)
+        current_color = color.black
+
+    cube = Entity(
+        model = 'cube',
+        color = current_color,
+        position = position - (0, 0, size[2] / 2),
+        collider = 'box',  # Add a box collider for detecting mouse hover
+        scale = size
+    )
     cubes.append(cube)
 
 # Define a function to add a new entity at the mouse's x and y position
@@ -71,20 +62,21 @@ def add_entity():
     # Use the mouse's position in 2D screen space to set the x and y of the entity
     mouse_x, mouse_y, _ = mouse.position  # Mouse position in screen space (-1 to 1)
     # Create a new entity at the x and y position with z set to 0
-    add_cube(position = mouse.position * camera.fov, type = "medium")
+    add_cube(position = mouse.position * camera.fov)
 
 # Input handling
 def input(key):
     global is_dragging, previous_mouse_position
     if key == 'left mouse down':  # Add a new entity on left mouse click
         if mouse.hovered_entity != button:
-            if orthographic_locked:
-                if mouse.hovered_entity in cubes:
-                    hovered_cube = mouse.hovered_entity
-                    cubes.remove(hovered_cube)
-                    destroy(hovered_cube)
-                else:
-                    add_entity()
+            if mouse.hovered_entity not in button_group:
+                if orthographic_locked:
+                    if mouse.hovered_entity in cubes:
+                        hovered_cube = mouse.hovered_entity
+                        cubes.remove(hovered_cube)
+                        destroy(hovered_cube)
+                    else:
+                        add_entity()
     elif key == 'right mouse down':  # Start dragging on right mouse down
         if mouse.hovered_entity != button:
             if not orthographic_locked:
@@ -162,13 +154,15 @@ def scroll_wheel():
 button_group = []
 
 # Define the buttons and add them to the group
-low = Button(text="Low Density", color=color.gray, position=(-0.5, 0.2), scale=(0.2, 0.1))
-medium = Button(text="Medium Density", color=color.gray, position=(-0.5, 0.1), scale=(0.2, 0.1))
-high = Button(text="High Density", color=color.gray, position=(-0.5, 0), scale=(0.2, 0.1))
-commercial = Button(text = "Commercial", color=color.gray, position=(-0.5, -0.1), scale=(0.2, 0.1))
-industrial = Button(text = "Industrial", color=color.gray, position=(-0.5, -0.2), scale=(0.2, 0.1))
+park = Button(text = "Park", color=color.gray, position=(-0.6, 0.3), scale=(0.2, 0.1))
+low = Button(text="Low Density", color=color.gray, position=(-0.6, 0.2), scale=(0.2, 0.1))
+medium = Button(text="Medium Density", color=color.gray, position=(-0.6, 0.1), scale=(0.2, 0.1))
+high = Button(text="High Density", color=color.gray, position=(-0.6, 0), scale=(0.2, 0.1))
+commercial = Button(text = "Commercial", color=color.gray, position=(-0.6, -0.1), scale=(0.2, 0.1))
+industrial = Button(text = "Industrial", color=color.gray, position=(-0.6, -0.2), scale=(0.2, 0.1))
 
 # Add buttons to the button group
+button_group.append(park)
 button_group.append(low)
 button_group.append(medium)
 button_group.append(high)
@@ -176,6 +170,7 @@ button_group.append(commercial)
 button_group.append(industrial)
 
 # Set the on_click handlers for each button
+park.on_click = lambda: on_button_click(park)
 low.on_click = lambda: on_button_click(low)
 medium.on_click = lambda: on_button_click(medium)
 high.on_click = lambda: on_button_click(high)
@@ -187,20 +182,33 @@ low.color = color.green  # Make the first button selected initially
 
 # Function to handle button selection
 def on_button_click(button):
+    global type
     # Deactivate all buttons in the group
     for b in button_group:
         b.color = color.gray  # Change color to indicate inactive state
 
     # Activate the selected button
     button.color = color.green  # Change color to indicate active state
-    print(f'{button.text} is selected')
+
+    if button == low:
+        type = "low"
+    elif button == medium:
+        type = "medium"
+    elif button == high:
+        type = "high"
+    elif button == commercial:
+        type = "commercial"
+    elif button == industrial:
+        type = "industrial"
+    elif button == park:
+        type = "park"
 
 button = Button(
     model='quad',
     text="Orthographic: On",
     color=color.azure,
     scale=(0.25, 0.1),
-    position=(-0.6, 0),  # Adjust position to act as a sidebar
+    position=(-0.6, -0.4),  # Adjust position to act as a sidebar
     on_click=toggle_orthographic
 )
 
@@ -212,8 +220,6 @@ bar = Entity(
     position=(-0.6, 0),
     z = 10
 )
-
-
 
 # Instructions for the user
 Text("Click LEFT MOUSE BUTTON to add a new entity at the mouse's X and Y position.", position=(0, 0.45), origin=(0, 0), scale=1.5)
