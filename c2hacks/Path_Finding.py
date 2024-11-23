@@ -27,15 +27,15 @@ class SlimeMoldSimulator:
 
         # Grid and nodes
         self.grid = [(x, y) for x in range(self.grid_size) for y in range(self.grid_size)]
-        self.obstacleCoords = self.generate_obstacles()
+       # self.obstacleCoords = self.generate_obstacles()
         self.paths = []
-
+'''
     def generate_obstacles(self):
         obstacles = []
         return obstacles
         #for _ in range(int(len(self.grid) * self.obstacle_chance)):
 
-
+'''
     def is_valid_position(self, position):
         """Check if the position is valid (within grid and not an obstacle)."""
         if position not in self.obstacleCoords:
@@ -85,7 +85,7 @@ class SlimeMoldSimulator:
         """Run the slime mold simulation and find paths to all endpoints."""
         self.paths = []
         for end in self.end_pointCoords:
-            parent_map, found_end = self.slime_mold_algorithm(self.start, [end])
+            parent_map, found_end = self.slime_mold_algorithm(self.start, self.end_pointCoords)
             if parent_map:
                 path = self.reconstruct_path(parent_map, self.start, found_end)
                 self.paths.append(path)
