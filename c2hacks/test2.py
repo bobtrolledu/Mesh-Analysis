@@ -34,7 +34,7 @@ def add_cube(position):
     global type
     size = None
     current_color = None
-    snapped_position = snap_to_grid(position, grid_size = 0.5)  # Snap to the grid
+    snapped_position = snap_to_grid(position, grid_size = 1)  # Snap to the grid
 
     if type == "low":
         size = (1, 1, 1)
@@ -230,7 +230,7 @@ bar = Entity(
 
 # Instructions for the user
 Text("Click LEFT MOUSE BUTTON to add a new entity at the mouse's X and Y position.", position=(0, 0.45), origin=(0, 0), scale=1.5)
-grid = Entity(model=Grid(1, 1), scale=(10, 10, 1), color=color.light_gray)
+grid = Entity(model=Grid(10, 10), scale=(10, 10, 1), color=color.light_gray, collider = 'box')
 
 # Run the app
 app.run()
