@@ -3,12 +3,10 @@ from ursina import *
 # Initialize the Ursina app
 app = Ursina()
 
-cubes = []
-grid_free_space = {}
+nodes = []
+obstacles = []
+power_node = None
 
-for i in range(-5,5):
-    for j in range(-5,5):
-        grid_free_space[Vec3(i, j, 0)] = False
 
 type = "low"
 
@@ -30,47 +28,39 @@ zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
-    global type
-    if type == "low" or type == "medium" or type == "high":
-        return Vec3(
-            round(position.x / grid_size) * grid_size,
-            round(position.y / grid_size) * grid_size,
-            round(position.z / grid_size) * grid_size
-        )
-    else
-        return Vec3(
-            round(position.x / grid_size) * grid_size,
-            round(position.y / grid_size) * grid_size,
-            round(position.z / grid_size) * grid_size
-        )
+    return Vec3(
+        round(position.x / grid_size) * grid_size,
+        round(position.y / grid_size) * grid_size,
+        round(position.z / grid_size) * grid_size
+    )
 
 def add_cube(position):
-    global type
+    global type, power_node, obstacles, nodes
     size = None
     current_color = None
-    snapped_position = snap_to_grid(position, grid_size = 1)  # Snap to the grid
-
-    if grid_free_space[snapped_position]:
-        return
+    snapped_position = snap_to_grid(position, grid_size = 0.5)  # Snap to the grid
 
     if type == "low":
-        size = (1, 1, 1)
+        size = (0.5, 0.5, 0.5)
         current_color = color.hex("9ee2f0")
     elif type == "medium":
-        size = (1, 1, 2)
+        size = (0.5, 0.5, 1)
         current_color = color.hex("fbb1b1")
     elif type == "high":
-        size = (1, 1, 3)
+        size = (0.5, 0.5, 1.5)
         current_color = color.hex("fde58b")
     elif type == "commercial":
-        size = (2, 2, 1)
+        size = (0.5, 0.5, 0.5)
         current_color = color.hex("d08d2e")
     elif type == "industrial":
-        size = (2, 2, 2)
+        size = (0.5, 0.5, 1)
         current_color = color.hex("2a2b2a")
     elif type == "park":
-        size = (2, 2, 0.5)
+        size = (0.5, 0.5, 0.5)
         current_color = color.hex("629460")
+    elif type == "power":
+        size = (0.5, 0.5, 0.5)
+        current_color = color.magenta
 
     cube = Entity(
         model = 'cube',
@@ -79,7 +69,18 @@ def add_cube(position):
         collider = 'box',  # Add a box collider for detecting mouse hover
         scale = size
     )
-    cubes.append(cube)
+
+    if type == "power":
+        if power_node is None:
+            power_node = cube
+        else:
+            destroy(cube)
+            return
+    elif type == "park":
+        obstacles.append(cube)
+        return
+    else:
+        nodes.append(cube)
 
 # Define a function to add a new entity at the mouse's x and y position
 def add_entity():
@@ -90,14 +91,22 @@ def add_entity():
 
 # Input handling
 def input(key):
-    global is_dragging, previous_mouse_position
+    global is_dragging, previous_mouse_position, power_node
     if key == 'left mouse down':  # Add a new entity on left mouse click
         if mouse.hovered_entity != button:
             if mouse.hovered_entity not in button_group:
                 if orthographic_locked:
-                    if mouse.hovered_entity in cubes:
+                    if mouse.hovered_entity in nodes:
                         hovered_cube = mouse.hovered_entity
-                        cubes.remove(hovered_cube)
+                        nodes.remove(hovered_cube)
+                        destroy(hovered_cube)
+                    elif mouse.hovered_entity in obstacles:
+                        hovered_cube = mouse.hovered_entity
+                        obstacles.remove(hovered_cube)
+                        destroy(hovered_cube)
+                    elif mouse.hovered_entity is power_node:
+                        hovered_cube = mouse.hovered_entity
+                        power_node = None
                         destroy(hovered_cube)
                     elif mouse.hovered_entity == grid:
                         add_entity()
@@ -124,8 +133,6 @@ def update():
         previous_mouse_position = Vec2(mouse.x, mouse.y)  # Update the previous mouse position
 
         # Apply rotation to the camera based on the delta
-        #pivot_rotate.rotation_y += delta.x * 100  # Rotate around the y-axis (horizontal drag)
-        #pivot_rotate.rotation_x -= delta.y * 100  # Rotate around the x-axis (vertical drag)
         pivot_rotate.rotation_z += (delta.x + delta.y) * 100
 
 # Function to toggle orthographic view
@@ -164,12 +171,13 @@ def reset_animation_flag():
 button_group = []
 
 # Define the buttons and add them to the group
-park = Button(text = "Park", color=color.gray, position=(-0.6, 0.3), scale=(0.2, 0.1))
-low = Button(text="Low Density", color=color.gray, position=(-0.6, 0.2), scale=(0.2, 0.1))
-medium = Button(text="Medium Density", color=color.gray, position=(-0.6, 0.1), scale=(0.2, 0.1))
-high = Button(text="High Density", color=color.gray, position=(-0.6, 0), scale=(0.2, 0.1))
-commercial = Button(text = "Commercial", color=color.gray, position=(-0.6, -0.1), scale=(0.2, 0.1))
-industrial = Button(text = "Industrial", color=color.gray, position=(-0.6, -0.2), scale=(0.2, 0.1))
+park = Button(model="quad", text = "Park", color=color.gray, position=(-0.6, 0.3), scale=(0.2, 0.1))
+low = Button(model="quad", text="Low Density", color=color.gray, position=(-0.6, 0.2), scale=(0.2, 0.1))
+medium = Button(model="quad", text="Medium Density", color=color.gray, position=(-0.6, 0.1), scale=(0.2, 0.1))
+high = Button(model="quad", text="High Density", color=color.gray, position=(-0.6, 0), scale=(0.2, 0.1))
+commercial = Button(model="quad", text = "Commercial", color=color.gray, position=(-0.6, -0.1), scale=(0.2, 0.1))
+industrial = Button(model="quad", text = "Industrial", color=color.gray, position=(-0.6, -0.2), scale=(0.2, 0.1))
+power = Button(model="quad", text = "Power", color=color.gray, position=(-0.6, -0.3), scale=(0.2, 0.1))
 
 # Add buttons to the button group
 button_group.append(park)
@@ -178,6 +186,7 @@ button_group.append(medium)
 button_group.append(high)
 button_group.append(commercial)
 button_group.append(industrial)
+button_group.append(power)
 
 # Set the on_click handlers for each button
 park.on_click = lambda: on_button_click(park)
@@ -186,9 +195,10 @@ medium.on_click = lambda: on_button_click(medium)
 high.on_click = lambda: on_button_click(high)
 commercial.on_click = lambda: on_button_click(commercial)
 industrial.on_click = lambda: on_button_click(industrial)
+power.on_click = lambda: on_button_click(power)
 
 # Set the first button as the default selected one
-low.color = color.green  # Make the first button selected initially
+low.color = color.hex("629460")  # Make the first button selected initially
 
 # Function to handle button selection
 def on_button_click(button):
@@ -198,7 +208,7 @@ def on_button_click(button):
         b.color = color.gray  # Change color to indicate inactive state
 
     # Activate the selected button
-    button.color = color.green  # Change color to indicate active state
+    button.color = color.hex("629460")  # Change color to indicate active state
 
     if button == low:
         type = "low"
@@ -212,14 +222,24 @@ def on_button_click(button):
         type = "industrial"
     elif button == park:
         type = "park"
+    elif button == power:
+        type = "power"
 
 button = Button(
     model='quad',
     text="Orthographic: On",
     color=color.azure,
     scale=(0.25, 0.1),
-    position=(-0.6, -0.4),  # Adjust position to act as a sidebar
+    position=(0.6, -0.4),  # Adjust position to act as a sidebar
     on_click=toggle_orthographic
+)
+
+analyze_button = Button(
+    model='quad',
+    text= "Analyze",
+    color=color.azure,
+    scale=(0.25, 0.1),
+    position=(0.6, -0.3),
 )
 
 bar = Entity(
@@ -233,7 +253,7 @@ bar = Entity(
 
 # Instructions for the user
 Text("Click LEFT MOUSE BUTTON to add a new entity at the mouse's X and Y position.", position=(0, 0.45), origin=(0, 0), scale=1.5)
-grid = Entity(model=Grid(10, 10), scale=(10, 10, 1), color=color.light_gray, collider = 'box')
+grid = Entity(model=Grid(20, 20), scale=(10, 10, 1), color=color.light_gray, collider = 'box')
 
 # Run the app
 app.run()
