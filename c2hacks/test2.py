@@ -151,12 +151,6 @@ def input(key):
     global is_dragging, previous_mouse_position, power_node
 
     if key == 'left mouse down':  # Add a new entity on left mouse click
-<<<<<<< HEAD
-<<<<<<< Updated upstream
-        add_entity()
-=======
-=======
->>>>>>> a222078fe8c175869f5e2a17d7b5b46c4741ee9e
         if mouse.hovered_entity != button:
             if mouse.hovered_entity not in button_group:
                 if orthographic_locked:
@@ -173,19 +167,11 @@ def input(key):
                     elif mouse.hovered_entity is power_node:
                         hovered_cube = mouse.hovered_entity
                         power_node = None
-<<<<<<< HEAD
                         if not heatmap_nodes:
                             heatmap_nodes.remove(hovered_cube)
                         destroy(hovered_cube)
                     elif mouse.hovered_entity == grid:
                         add_entity()
->>>>>>> Stashed changes
-=======
-                        heatmap_nodes.remove(hovered_cube)
-                        destroy(hovered_cube)
-                    elif mouse.hovered_entity == grid:
-                        add_entity()
->>>>>>> a222078fe8c175869f5e2a17d7b5b46c4741ee9e
     elif key == 'right mouse down':  # Start dragging on right mouse down
         if mouse.hovered_entity != button:
             if not orthographic_locked:
