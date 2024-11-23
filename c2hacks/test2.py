@@ -7,6 +7,8 @@ nodes = []
 obstacles = []
 power_node = None
 
+popup_text = None
+
 
 type = "low"
 
@@ -34,40 +36,74 @@ def snap_to_grid(position, grid_size):
         round(position.z / grid_size) * grid_size
     )
 
+# Function to show a popup with the building's name
+def show_popup(cube):
+    global popup_text
+
+    # If a popup already exists, destroy it
+    if popup_text:
+        destroy(popup_text)
+
+    # Create the popup
+    popup_text = Text(
+        text=f"Building: {cube.name}",
+        position=(mouse.position.x + 0.1, mouse.position.y + 0.1),  # Adjust the position of the popup
+        origin=(0, 0),
+        scale=1,
+        background=True
+    )
+
+# Function to destroy the popup
+def destroy_popup():
+    global popup_text
+    if popup_text:
+        destroy(popup_text)
+        popup_text = None
+
+
 def add_cube(position):
     global type, power_node, obstacles, nodes
     size = None
     current_color = None
+    name = None
     snapped_position = snap_to_grid(position, grid_size = 0.5)  # Snap to the grid
 
     if type == "low":
         size = (0.5, 0.5, 0.5)
         current_color = color.hex("9ee2f0")
+        name = "Low Density Building"
     elif type == "medium":
         size = (0.5, 0.5, 1)
         current_color = color.hex("fbb1b1")
+        name = "Medium Density Building"
     elif type == "high":
         size = (0.5, 0.5, 1.5)
         current_color = color.hex("fde58b")
+        name = "High Density Building"
     elif type == "commercial":
         size = (0.5, 0.5, 0.5)
         current_color = color.hex("d08d2e")
+        name = "Commercial Building"
     elif type == "industrial":
         size = (0.5, 0.5, 1)
         current_color = color.hex("2a2b2a")
+        name = "Industrial Building"
     elif type == "park":
         size = (0.5, 0.5, 0.5)
         current_color = color.hex("629460")
+        name = "Park Building"
     elif type == "power":
         size = (0.5, 0.5, 0.5)
         current_color = color.magenta
+        name = "Power Generation"
 
     cube = Entity(
         model = 'cube',
         color = current_color,
         position = snapped_position - (0, 0, size[2] / 2),
         collider = 'box',  # Add a box collider for detecting mouse hover
-        scale = size
+        scale = size,
+        name = name
     )
 
     if type == "power":
@@ -92,6 +128,7 @@ def add_entity():
 # Input handling
 def input(key):
     global is_dragging, previous_mouse_position, power_node
+
     if key == 'left mouse down':  # Add a new entity on left mouse click
         if mouse.hovered_entity != button:
             if mouse.hovered_entity not in button_group:
@@ -134,6 +171,19 @@ def update():
 
         # Apply rotation to the camera based on the delta
         pivot_rotate.rotation_z += (delta.x + delta.y) * 100
+
+    if not orthographic_locked:
+        for entity in nodes:
+            if entity.hovered:
+                show_popup(entity)
+        for entity in obstacles:
+            if entity.hovered:
+                show_popup(entity)
+        if power_node and power_node.hovered:
+            show_popup(power_node)
+
+        if not mouse.hovered_entity or mouse.hovered_entity is grid:
+            destroy_popup()
 
 # Function to toggle orthographic view
 def toggle_orthographic():
