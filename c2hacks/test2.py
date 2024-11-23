@@ -23,9 +23,6 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 #light3 = PointLight(position=Vec3(-6, 6, 10))
 #light4 = PointLight(position=Vec3(6, 6, 10))
 
-
-
-
 type = "low"
 
 pivot = Entity()
@@ -248,6 +245,8 @@ def analyze_nodes():
     simulator = PF.SlimeMoldSimulator(grid_size=20, endpoints=nodes, obstacle_chance=0, start_coords=start)
     simulator.run()
     simulator.plot()
+
+def draw_heatmap():
     heatmap = HM.HeatMap(nodes=heatmap_nodes)
     heatmap.generate_heatmap()
 
@@ -334,6 +333,7 @@ heatmap_button = Button(
     color=color.azure,
     scale=(0.25, 0.1),
     position=(0.6, -0.2),
+    on_click=draw_heatmap
 )
 
 bar = Entity(
