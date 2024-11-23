@@ -1,17 +1,23 @@
 import matplotlib.pyplot as plt
 
 end_pointCoords = []
-obstacle_coords = []
-obstacle, obstacles = [], []
+obstacleCoords = []
 
 class SlimeMoldSimulator:
 
-    def __init__(self, grid_size, endpoints, obstacle, start_coords):
-        self.end_pointCoords = [(i.position.x + 10, i.position.y + 10) for i in endpoints]
-        self.obstacles = [(i.position.x + 10, i.position.y + 10) for i in obstacle]
+    def __init__(self, grid_size, endpoints, obstacle, start_coords, obstacle_chance=0):
+        self.end_pointCoords = end_pointCoords
+        self.obstacleCoords = obstacleCoords
+
+        for i in endpoints:
+            end_pointCoords.append((i.position.x + 10, i.position.y + 10))
+
+        for i in obstacle:
+            obstacleCoords.append((i.position.x + 10, i.position.y + 10))
+
         self.start = start_coords
         self.grid_size = grid_size + 1
-
+        self.obstacle_chance = obstacle_chance
         # Constants
         self.start_node_color = 'red'
         self.end_node_color = 'green'
@@ -21,20 +27,18 @@ class SlimeMoldSimulator:
 
         # Grid and nodes
         self.grid = [(x, y) for x in range(self.grid_size) for y in range(self.grid_size)]
-
+        self.obstacleCoords = self.generate_obstacles()
         self.paths = []
-    '''
+
     def generate_obstacles(self):
-        global obstacle, obstacles
-        for i in obstacle_coords:
-            obstacle = (i.position.x, i.position.y)
-            if (i.position.x, i.position.y + 5) not in obstacles:
-                obstacles.append((i.position.x, i.position.y  + 5))
-        return
-    '''
+        obstacles = []
+        return obstacles
+        #for _ in range(int(len(self.grid) * self.obstacle_chance)):
+
+
     def is_valid_position(self, position):
         """Check if the position is valid (within grid and not an obstacle)."""
-        if position not in self.obstacles:
+        if position not in self.obstacleCoords:
             x, y = position
             return 0 <= x < self.grid_size and 0 <= y < self.grid_size
         return False
@@ -81,7 +85,7 @@ class SlimeMoldSimulator:
         """Run the slime mold simulation and find paths to all endpoints."""
         self.paths = []
         for end in self.end_pointCoords:
-            parent_map, found_end = self.slime_mold_algorithm(self.start, self.end_pointCoords)
+            parent_map, found_end = self.slime_mold_algorithm(self.start, [end])
             if parent_map:
                 path = self.reconstruct_path(parent_map, self.start, found_end)
                 self.paths.append(path)
@@ -91,7 +95,7 @@ class SlimeMoldSimulator:
         fig, ax = plt.subplots(figsize=(10, 10))
 
         # Plot obstacles
-        obstacle_x, obstacle_y = zip(*self.obstacles) if self.obstacles else ([], [])
+        obstacle_x, obstacle_y = zip(*self.obstacleCoords) if self.obstacleCoords else ([], [])
         ax.scatter(
             obstacle_x, obstacle_y, color=self.obstacle_color, s=10, marker='s', label="Obstacles"
         )
