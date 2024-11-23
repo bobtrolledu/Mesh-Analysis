@@ -139,7 +139,7 @@ def update():
 # Function to toggle orthographic view
 def toggle_orthographic():
     global orthographic_locked, is_animating
-    simulator = PF.SlimeMoldSimulator(grid_size=10, endpoints=cubes, obstacle=obstacles, start_coords=start)
+    simulator = PF.SlimeMoldSimulator(grid_size=10, endpoints=cubes, obstacle_chance=0, start_coords=start)
     simulator.run()
     simulator.plot()
     if is_animating:
