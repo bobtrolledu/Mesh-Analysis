@@ -30,7 +30,31 @@ def add_entity():
 def input(key):
     global is_dragging, previous_mouse_position
     if key == 'left mouse down':  # Add a new entity on left mouse click
+<<<<<<< Updated upstream
         add_entity()
+=======
+        if mouse.hovered_entity != button:
+            if mouse.hovered_entity not in button_group:
+                if orthographic_locked:
+                    if mouse.hovered_entity in nodes:
+                        hovered_cube = mouse.hovered_entity
+                        nodes.remove(hovered_cube)
+                        heatmap_nodes.remove(hovered_cube)
+                        destroy(hovered_cube)
+                    elif mouse.hovered_entity in obstacles:
+                        hovered_cube = mouse.hovered_entity
+                        obstacles.remove(hovered_cube)
+                        heatmap_nodes.remove(hovered_cube)
+                        destroy(hovered_cube)
+                    elif mouse.hovered_entity is power_node:
+                        hovered_cube = mouse.hovered_entity
+                        power_node = None
+                        if not heatmap_nodes:
+                            heatmap_nodes.remove(hovered_cube)
+                        destroy(hovered_cube)
+                    elif mouse.hovered_entity == grid:
+                        add_entity()
+>>>>>>> Stashed changes
     elif key == 'right mouse down':  # Start dragging on right mouse down
         is_dragging = True
         previous_mouse_position = Vec2(mouse.x, mouse.y)  # Store the starting mouse position
