@@ -4,8 +4,12 @@ import random
 # Initialize the Ursina app
 app = Ursina()
 
+pivot = Entity()
+
 camera.orthographic = True
 camera.fov = 10  # Controls the size of the orthographic view (adjust as needed)
+camera.parent = pivot
+
 
 # Variables for rotation tracking
 is_dragging = False  # Tracks whether the right mouse button is held
@@ -46,8 +50,8 @@ def update():
         previous_mouse_position = Vec2(mouse.x, mouse.y)  # Update the previous mouse position
 
         # Apply rotation to the camera based on the delta
-        camera.rotation_y += delta.x * 100  # Rotate around the y-axis (horizontal drag)
-        camera.rotation_x -= delta.y * 100  # Rotate around the x-axis (vertical drag)
+        pivot.rotation_y += delta.x * 100  # Rotate around the y-axis (horizontal drag)
+        pivot.rotation_x -= delta.y * 100  # Rotate around the x-axis (vertical drag)
 
 # Function to toggle orthographic view
 def toggle_orthographic():
@@ -55,7 +59,7 @@ def toggle_orthographic():
     orthographic_locked = not orthographic_locked  # Toggle the state
     camera.orthographic = orthographic_locked
     button.text = f"Orthographic: {'On' if orthographic_locked else 'Off'}"
-    camera.fov = 120
+    camera.fov = 100
 
 # Scroll wheel zoom function
 def scroll_wheel():
@@ -76,13 +80,13 @@ button = Button(
     text="Orthographic: On",
     color=color.azure,
     scale=(0.2, 0.1),
-    position=(-0.7, 0),  # Adjust position to act as a sidebar
+    position=(-0.5, 0),  # Adjust position to act as a sidebar
     on_click=toggle_orthographic
 )
 
 # Instructions for the user
 Text("Click LEFT MOUSE BUTTON to add a new entity at the mouse's X and Y position.", position=(0, 0.45), origin=(0, 0), scale=1.5)
-grid = Entity(model=Grid(100, 100), scale=(10, 10, 1), color=color.light_gray)
+grid = Entity(model=Grid(80, 80), scale=(10, 10, 1), color=color.light_gray)
 
 # Run the app
 app.run()
