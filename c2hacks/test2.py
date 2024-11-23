@@ -4,6 +4,12 @@ from ursina import *
 app = Ursina()
 
 cubes = []
+grid_free_space = {}
+
+for i in range(-5,5):
+    for j in range(-5,5):
+        grid_free_space[Vec3(i, j, 0)] = False
+
 type = "low"
 
 pivot = Entity()
@@ -24,11 +30,19 @@ zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
-    return Vec3(
-        round(position.x / grid_size) * grid_size,
-        round(position.y / grid_size) * grid_size,
-        round(position.z / grid_size) * grid_size
-    )
+    global type
+    if type == "low" or type == "medium" or type == "high":
+        return Vec3(
+            round(position.x / grid_size) * grid_size,
+            round(position.y / grid_size) * grid_size,
+            round(position.z / grid_size) * grid_size
+        )
+    else
+        return Vec3(
+            round(position.x / grid_size) * grid_size,
+            round(position.y / grid_size) * grid_size,
+            round(position.z / grid_size) * grid_size
+        )
 
 def add_cube(position):
     global type
@@ -36,24 +50,27 @@ def add_cube(position):
     current_color = None
     snapped_position = snap_to_grid(position, grid_size = 1)  # Snap to the grid
 
+    if grid_free_space[snapped_position]:
+        return
+
     if type == "low":
         size = (1, 1, 1)
-        current_color = color.green
+        current_color = color.hex("9ee2f0")
     elif type == "medium":
         size = (1, 1, 2)
-        current_color = color.yellow
+        current_color = color.hex("fbb1b1")
     elif type == "high":
         size = (1, 1, 3)
-        current_color = color.orange
+        current_color = color.hex("fde58b")
     elif type == "commercial":
         size = (2, 2, 1)
-        current_color = color.blue
+        current_color = color.hex("d08d2e")
     elif type == "industrial":
         size = (2, 2, 2)
-        current_color = color.red
+        current_color = color.hex("2a2b2a")
     elif type == "park":
         size = (2, 2, 0.5)
-        current_color = color.black
+        current_color = color.hex("629460")
 
     cube = Entity(
         model = 'cube',
@@ -82,7 +99,7 @@ def input(key):
                         hovered_cube = mouse.hovered_entity
                         cubes.remove(hovered_cube)
                         destroy(hovered_cube)
-                    else:
+                    elif mouse.hovered_entity == grid:
                         add_entity()
     elif key == 'right mouse down':  # Start dragging on right mouse down
         if mouse.hovered_entity != button:
@@ -141,20 +158,6 @@ def toggle_orthographic():
 def reset_animation_flag():
     global is_animating
     is_animating = False
-
-# Scroll wheel zoom function
-def scroll_wheel():
-    global zoom_factor, camera
-    # Zoom in (scroll up) or zoom out (scroll down)
-    if mouse.scroll != 0:
-        if orthographic_locked:
-            # In orthographic mode, adjust the FOV
-            camera.fov += mouse.scroll * 0.5  # Adjust the multiplier for desired zoom speed
-            camera.fov = max(1, min(camera.fov, 50))  # Limit the FOV to a range between 1 and 50
-        else:
-            # In perspective mode, adjust the camera's position
-            camera.position.z += mouse.scroll * 0.5  # Adjust the multiplier for zoom speed
-            camera.position.z = max(-20, min(camera.position.z, -1))  # Limit the zoom range
 
 #UI
 # Create a group of buttons
