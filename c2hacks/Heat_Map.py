@@ -38,13 +38,8 @@ class HeatMap:
             return
 
         # KDE parameters
-<<<<<<< HEAD
         grid_size = 0.3  # Grid size for KDE
         h = 3  # Radius of influence
-=======
-        grid_size = 1  # Grid size for KDE
-        h = 10  # Radius of influence
->>>>>>> a222078fe8c175869f5e2a17d7b5b46c4741ee9e
 
         # Define grid bounds
         x_min, x_max = min(x) - h, max(x) + h
