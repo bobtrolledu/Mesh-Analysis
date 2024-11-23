@@ -1,4 +1,5 @@
 from ursina import *
+import Path_Finding as PF
 
 # Initialize the Ursina app
 app = Ursina()
@@ -9,6 +10,19 @@ power_node = None
 
 popup_text = None
 
+ambient = AmbientLight()
+
+#sun = DirectionalLight(position=Vec3(5,5, -100))
+#sun.look_at(Vec3(0,0,0))
+#sun.intensity = 0.5
+
+light1 = PointLight(position=Vec3(-6, -6, 10))
+#light2 = PointLight(position=Vec3(6, -6, 10))
+#light3 = PointLight(position=Vec3(-6, 6, 10))
+#light4 = PointLight(position=Vec3(6, 6, 10))
+
+
+
 
 type = "low"
 
@@ -18,6 +32,9 @@ camera.orthographic = True
 camera.fov = 15  # Controls the size of the orthographic view (adjust as needed)
 camera.parent = pivot
 pivot.parent = pivot_rotate
+start = None
+grid_shift_x = 0
+grid_shift_y = 0
 
 # Variables for rotation tracking
 is_dragging = False  # Tracks whether the right mouse button is held
@@ -103,12 +120,15 @@ def add_cube(position):
         position = snapped_position - (0, 0, size[2] / 2),
         collider = 'box',  # Add a box collider for detecting mouse hover
         scale = size,
-        name = name
+        name = name,
+        cast_shadows = True
     )
 
     if type == "power":
         if power_node is None:
+            global start
             power_node = cube
+            start = (cube.position.x + (5 - grid_shift_x), cube.position.y + (5 - grid_shift_y))
         else:
             destroy(cube)
             return
@@ -216,6 +236,12 @@ def reset_animation_flag():
     global is_animating
     is_animating = False
 
+def analyze_nodes():
+    global start
+    simulator = PF.SlimeMoldSimulator(grid_size=10, endpoints=nodes, obstacle=obstacles, start_coords=start)
+    simulator.run()
+    simulator.plot()
+
 #UI
 # Create a group of buttons
 button_group = []
@@ -290,6 +316,7 @@ analyze_button = Button(
     color=color.azure,
     scale=(0.25, 0.1),
     position=(0.6, -0.3),
+    on_click=analyze_nodes
 )
 
 bar = Entity(
@@ -303,7 +330,7 @@ bar = Entity(
 
 # Instructions for the user
 Text("Click LEFT MOUSE BUTTON to add a new entity at the mouse's X and Y position.", position=(0, 0.45), origin=(0, 0), scale=1.5)
-grid = Entity(model=Grid(20, 20), scale=(10, 10, 1), color=color.light_gray, collider = 'box')
+grid = Entity(model=Grid(20, 20), scale=(10, 10, 1), color=color.light_gray, collider = 'box', position=(grid_shift_x, grid_shift_y, 0), receive_shadows = True)
 
 # Run the app
 app.run()
