@@ -1,5 +1,4 @@
 from ursina import *
-import random
 
 # Initialize the Ursina app
 app = Ursina()
@@ -23,11 +22,19 @@ orthographic_locked = True
 is_animating = False
 zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
+# Grid snapping function
+def snap_to_grid(position, grid_size):
+    return Vec3(
+        round(position.x / grid_size) * grid_size,
+        round(position.y / grid_size) * grid_size,
+        round(position.z / grid_size) * grid_size
+    )
 
 def add_cube(position):
     global type
-    size = (1, 1, 1)
-    current_color = color.green
+    size = None
+    current_color = None
+    snapped_position = snap_to_grid(position, grid_size = 0.5)  # Snap to the grid
 
     if type == "low":
         size = (1, 1, 1)
@@ -51,7 +58,7 @@ def add_cube(position):
     cube = Entity(
         model = 'cube',
         color = current_color,
-        position = position - (0, 0, size[2] / 2),
+        position = snapped_position - (0, 0, size[2] / 2),
         collider = 'box',  # Add a box collider for detecting mouse hover
         scale = size
     )
@@ -223,7 +230,7 @@ bar = Entity(
 
 # Instructions for the user
 Text("Click LEFT MOUSE BUTTON to add a new entity at the mouse's X and Y position.", position=(0, 0.45), origin=(0, 0), scale=1.5)
-grid = Entity(model=Grid(50, 50), scale=(10, 10, 1), color=color.light_gray)
+grid = Entity(model=Grid(1, 1), scale=(10, 10, 1), color=color.light_gray)
 
 # Run the app
 app.run()
