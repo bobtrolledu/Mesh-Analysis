@@ -377,21 +377,22 @@ def analyze_nodes():
     animate_line()
 
 def calculate_energy_usage():
-    global nodes
-
-    sum = 0;
-
+    global nodes, low_value, medium_value, high_value, commercial_value, industrial_value
+    sum = 0
     for node in nodes:
         if node.name == "Low Density Building":
-
+            sum += low_value
         elif node.name == "Medium Density Building":
-
+            sum += medium_value
         elif node.name == "High Density Building":
-
+            sum += high_value
         elif node.name == "Commercial Building":
-
+            sum += commercial_value
         elif node.name == "Industrial Building":
+            sum += industrial_value
 
+    print(sum)
+    return sum
 
 def map_range(x, in_min, in_max, out_min, out_max):
   return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
@@ -508,7 +509,7 @@ def enable_wp():
     wp.enabled = True
 
 def enable_analysis_interface():
-
+    return
 
 #UI
 # Create a group of buttons
@@ -639,7 +640,7 @@ data = Button(
     scale=(0.2, 0.07),
     position=(0.3, 0.45),
     z = 0,
-    on_click=clear
+    on_click=calculate_energy_usage
 )
 
 bar = Entity(
