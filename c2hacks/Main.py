@@ -452,27 +452,27 @@ def update_heatmap(hour):
 def simulate(bias, hour):
     global low_value, medium_value, high_value, commercial_value, industrial_value
     if bias:
-        if low_value > 0:
-            low_value -= 1
-        if medium_value > 10:
-            medium_value -= 1
-        if high_value > 20:
-            high_value -= 1
-        if commercial_value < 40:
-            commercial_value += 1
-        if industrial_value < 50:
-            industrial_value += 1
+        if low_value > 10:
+            low_value -= 10
+        if medium_value > 200:
+            medium_value -= 30
+        if high_value > 500:
+            high_value -= 60
+        if commercial_value < 100:
+            commercial_value += 10
+        if industrial_value < 9000:
+            industrial_value += 100
     else:
-        if low_value < 10:
-            low_value += 1
-        if medium_value < 20:
-            medium_value += 1
-        if high_value < 30:
-            high_value += 1
-        if commercial_value > 30:
-            commercial_value -= 1
-        if industrial_value > 40:
-            industrial_value -= 1
+        if low_value < 600:
+            low_value += 30
+        if medium_value < 5000:
+            medium_value += 60
+        if high_value < 8000:
+            high_value += 80
+        if commercial_value > 50:
+            commercial_value -= 10
+        if industrial_value > 50:
+            industrial_value -= 80
     update_power_weights()
     update_heatmap(hour)
 
