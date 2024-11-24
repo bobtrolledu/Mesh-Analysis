@@ -35,11 +35,7 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 
 type = "low"
 
-low_value = 80.0 * 2
-medium_value = 10.0 * 500
-high_value = 3 * 1000
-commercial_value = 5 * 30
-industrial_value = 1 * 1200
+low_value, medium_value, high_value, commercial_value, industrial_value = 0, 0, 0, 0, 0
 
 power_weights = {
     "low": low_value,
@@ -342,6 +338,8 @@ def toggle_orthographic():
         return
 
     is_animating = True
+
+    update_params()
 
     if orthographic_locked:
         orthographic_locked = not orthographic_locked  # Toggle the state
@@ -737,11 +735,11 @@ analysis_screen = Entity(
 )
 
 # Create individual elements first
-low_density_slider = ThinSlider(1, 100, default=80, step=1, dynamic= False, on_value_changed = update_params)
-medium_density_slider = ThinSlider(1, 20, default=10, step=1, dynamic= False, on_value_changed = update_params)
-high_density_slider = ThinSlider(1, 15, default=3, step=1, dynamic= False, on_value_changed = update_params)
-commercial_slider = ThinSlider(1, 10, default=5, step=1, dynamic= False, on_value_changed = update_params)
-industrial_slider = ThinSlider(1, 3, default=1, step=1, dynamic= False, on_value_changed = update_params)
+low_density_slider = ThinSlider(1, 100, default=80, step=1, dynamic= True, on_value_changed = update_params)
+medium_density_slider = ThinSlider(1, 20, default=10, step=1, dynamic= True, on_value_changed = update_params)
+high_density_slider = ThinSlider(1, 15, default=3, step=1, dynamic= True, on_value_changed = update_params)
+commercial_slider = ThinSlider(1, 10, default=5, step=1, dynamic= True, on_value_changed = update_params)
+industrial_slider = ThinSlider(1, 3, default=1, step=1, dynamic= True, on_value_changed = update_params)
 
 # Now define the window panel
 wp = WindowPanel(
