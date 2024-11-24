@@ -33,11 +33,11 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 
 type = "low"
 
-low_value = 5.0
-medium_value = 10.0
-high_value = 20.0
-commercial_value = 30.0
-industrial_value = 40.0
+low_value = 80.0 * 2
+medium_value = 10.0 * 500
+high_value = 3 * 1000
+commercial_value = 5 * 30
+industrial_value = 1 * 1200
 
 power_weights = {
     "low": low_value,
@@ -80,7 +80,7 @@ def update_params():
     low_value = round(low_density_slider.value, 4) * 2
     medium_value = round(medium_density_slider.value, 4) * 500
     high_value = round(high_density_slider.value, 4) * 1000
-    commercial_value = round(commercial_slider.value, 4) * 3
+    commercial_value = round(commercial_slider.value, 4) * 50
     industrial_value = round(industrial_slider.value, 4) * 1200
     power_weights = {
         "low": low_value,
