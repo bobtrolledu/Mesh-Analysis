@@ -67,11 +67,11 @@ zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
-    print(Vec3(
+    """print(Vec3(
         round(position.x / grid_size) * grid_size,
         round(position.y / grid_size) * grid_size,
         round(position.z / grid_size) * grid_size
-    ))
+    ))"""
     return Vec3(
         round(position.x / grid_size) * grid_size,
         round(position.y / grid_size) * grid_size,
@@ -342,9 +342,52 @@ def analyze_nodes():
         destroy(i)
     animate_line()
 
+def map_range(x, in_min, in_max, out_min, out_max):
+  return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
+
+# Function to map intensity to a color gradient
+def intensity_to_color(value):
+    """
+    Map a normalized intensity value (0.0 to 1.0) to a gradient color
+    from blue (low) to red (high) via green, yellow, and orange.
+    """
+    value = value/255
+
+    if value <= 0.25:
+        return lerp(color.blue, color.green, value * 4)  # Blue to Green
+    elif value <= 0.5:
+        return lerp(color.green, color.yellow, (value - 0.25) * 4)  # Green to Yellow
+    elif value <= 0.75:
+        return lerp(color.yellow, color.orange, (value - 0.5) * 4)  # Yellow to Orange
+    else:
+        return lerp(color.orange, color.red, (value - 0.75) * 4)  # Orange to Red
+
 def draw_heatmap():
     heatmap = HM.HeatMap(nodes=heatmap_nodes,power_weights=power_weights)
     heatmap.generate_heatmap()
+    intensity_array = heatmap.get_intensity_array()
+    max_value = []
+    for i in intensity_array:
+        max_value.append(max(i))
+
+    normalized_intensity_array = []
+
+    for i in intensity_array:
+        new_i = []
+        for j in i:
+            new_i.append(map_range(j, 0, max(max_value), 0, 255))
+        normalized_intensity_array.append(new_i)
+
+    grid_size = len(normalized_intensity_array)
+    for y, row in enumerate(normalized_intensity_array):
+        for x, value in enumerate(row):
+            color_value = intensity_to_color(value)
+            Entity(
+                model="cube",
+                color=color_value,
+                position= Vec3((x-20)/4, (y-20)/4, -value/100),  # Adjust position for grid layout
+                scale=(1/4, 1/4, 1)
+            )
 
 def enable_wp():
     wp.enabled = True

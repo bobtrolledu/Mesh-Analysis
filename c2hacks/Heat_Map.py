@@ -6,6 +6,7 @@ class HeatMap:
     def __init__(self, nodes, power_weights):
         self.nodes = nodes
         self.power_weights = power_weights
+        self.intensity_array = []
 
     def generate_heatmap(self):
 
@@ -69,6 +70,7 @@ class HeatMap:
 
         # Convert to numpy array for plotting
         intensity = np.array(intensity_list)
+        self.intensity_array = intensity.tolist()
 
         # Plot heatmap
         plt.figure(figsize=(10, 10))
@@ -83,3 +85,6 @@ class HeatMap:
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.show()
+
+    def get_intensity_array(self):
+        return self.intensity_array
