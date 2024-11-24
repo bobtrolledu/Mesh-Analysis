@@ -33,11 +33,11 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 
 type = "low"
 
-low_value = 5.0
-medium_value = 10.0
-high_value = 20.0
-commercial_value = 30.0
-industrial_value = 40.0
+low_value = 80.0 * 2
+medium_value = 10.0 * 500
+high_value = 3 * 1000
+commercial_value = 5 * 30
+industrial_value = 1 * 1200
 
 power_weights = {
     "low": low_value,
@@ -80,7 +80,7 @@ def update_params():
     low_value = round(low_density_slider.value, 4) * 2
     medium_value = round(medium_density_slider.value, 4) * 500
     high_value = round(high_density_slider.value, 4) * 1000
-    commercial_value = round(commercial_slider.value, 4) * 3
+    commercial_value = round(commercial_slider.value, 4) * 50
     industrial_value = round(industrial_slider.value, 4) * 1200
     power_weights = {
         "low": low_value,
@@ -376,6 +376,24 @@ def analyze_nodes():
     PF.plot(obstacle_coord, start)
     animate_line()
 
+def calculate_energy_usage():
+    global nodes, low_value, medium_value, high_value, commercial_value, industrial_value
+    sum = 0
+    for node in nodes:
+        if node.name == "Low Density Building":
+            sum += low_value
+        elif node.name == "Medium Density Building":
+            sum += medium_value
+        elif node.name == "High Density Building":
+            sum += high_value
+        elif node.name == "Commercial Building":
+            sum += commercial_value
+        elif node.name == "Industrial Building":
+            sum += industrial_value
+
+    print(sum)
+    return sum
+
 def map_range(x, in_min, in_max, out_min, out_max):
   return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
 
@@ -489,6 +507,9 @@ def simulate_queue():
 
 def enable_wp():
     wp.enabled = True
+
+def enable_analysis_interface():
+    return
 
 #UI
 # Create a group of buttons
@@ -619,7 +640,7 @@ data = Button(
     scale=(0.2, 0.07),
     position=(0.3, 0.45),
     z = 0,
-    on_click=clear
+    on_click=calculate_energy_usage
 )
 
 bar = Entity(
