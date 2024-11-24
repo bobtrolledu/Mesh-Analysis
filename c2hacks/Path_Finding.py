@@ -1,5 +1,6 @@
 import random
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 
 end_pointCoords = []
 
@@ -10,7 +11,7 @@ class SlimeMoldSimulator:
         self.grid_size = grid_size + 1
         self.endpoints = endpoints
         for i in endpoints:
-            end_pointCoords.append((i.position.x, i.position.y + 5))
+            end_pointCoords.append((i.position.x *2 + 10, i.position.y *2 + 10))
 
         self.obstacle_chance = obstacle_chance
         # Constants
@@ -55,7 +56,7 @@ class SlimeMoldSimulator:
 
             for slime in slime_positions:
                 # Spread the slime in 4 cardinal directions (up, down, left, right)
-                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                for dx, dy in [(-0.5, 0), (0.5, 0), (0, -0.5), (0, 0.5)]:
                     new_position = (slime[0] + dx, slime[1] + dy)
 
                     if self.is_valid_position(new_position) and new_position not in visited:
@@ -116,11 +117,13 @@ class SlimeMoldSimulator:
 
         # Label the plot
         ax.set_title("Slime Mold Algorithm Finding Paths to Multiple Endpoints in Grid")
-        #ax.legend(loc="best")
-        ax.set_xlim(-0.5, self.grid_size - 0.5)
-        ax.set_ylim(-0.5, self.grid_size - 0.5)
         ax.set_xlabel("X Coordinate")
         ax.set_ylabel("Y Coordinate")
-        plt.grid(False)
+        ax.yaxis.set(major_locator = ticker.MultipleLocator(5), minor_locator = ticker.MultipleLocator(1))
+        ax.xaxis.set(major_locator = ticker.MultipleLocator(5), minor_locator = ticker.MultipleLocator(1))
+        ax.grid(which='major', alpha=0.5)
+        ax.grid(which='minor', alpha=0.2, linestyle='--')
+        plt.xlim(0, 20)
+        plt.ylim(0, 20)
+        plt.grid(True)
         plt.show()
-
