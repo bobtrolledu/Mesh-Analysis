@@ -9,6 +9,9 @@ app = Ursina(development_mode=True)
 # Set window size (width, height) in pixels
 window.size = (16*100, 9*100)  # Adjust the window size as needed
 window.title = "Energy Emulator"  # Set the window title
+window.draggable = True
+window.resizable = True
+window.borderless = False
 scene.background_color = color.white
 
 nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel = [],[],[],[],[],[],[],[]
