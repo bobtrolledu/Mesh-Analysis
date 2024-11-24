@@ -3,13 +3,14 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from io import BytesIO
 
-def create_matplotlib_texture():
+total_textures = []
+
+def create_matplotlib_texture(xvar, yvar, label):
     # Generate a Matplotlib plot
     fig, ax = plt.subplots()
-    x = [1, 2, 3, 4, 5]
-    y = [2, 3, 5, 7, 11]
-    ax.plot(x, y, label='Example Data')
-    ax.set_title("Matplotlib in Ursina")
+
+    ax.plot(xvar, yvar)
+    ax.set_title(label)
     ax.legend()
 
     # Save the plot to an in-memory buffer
@@ -21,19 +22,15 @@ def create_matplotlib_texture():
     img = Image.open(buf)
     texture = Texture(img)
     buf.close()
-    return texture
 
-app = Ursina()
+    total_textures.append(texture)
 
-# Create a texture from the Matplotlib plot
-plot_texture = create_matplotlib_texture()
+def create_simple_texture(buffer):
+    img = Image.open(buffer)
+    texture = Texture(img)
+    buffer.close()
+    total_textures.append(texture)
 
-# Display the texture in Ursina
-plot_entity = Entity(
-    model='quad',
-    texture=plot_texture,
-    scale=(6, 4),  # Adjust scale as needed
-    position=(0, 0, 0)  # Centered
-)
+def display():
+    return total_textures
 
-app.run()
