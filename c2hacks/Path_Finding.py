@@ -3,20 +3,22 @@ import matplotlib.pyplot as plt
 from matplotlib import ticker
 
 end_pointCoords = []
+obstacles = []
 
 class SlimeMoldSimulator:
 
-    def __init__(self, grid_size, endpoints, obstacle_chance, start_coords):
+    def __init__(self, grid_size, endpoints, obstacle_chance, start_coords, obstacles):
         self.end_pointCoords = end_pointCoords
+        self.obstacles = obstacles
         self.grid_size = grid_size + 1
         self.endpoints = endpoints
         for i in endpoints:
-            end_pointCoords.append((i.position.x *2 + 10, i.position.y *2 + 10))
+            end_pointCoords.append((i.position.x * 2 + 10, i.position.y * 2 + 10))
 
         self.obstacle_chance = obstacle_chance
         # Constants
-        self.start_node_color = 'red'
-        self.end_node_color = 'green'
+        self.start_node_color = 'green'
+        self.end_node_color = 'red'
         self.slime_color = 'yellow'
         self.obstacle_color = 'gray'
         self.path_color = 'blue'
@@ -25,17 +27,14 @@ class SlimeMoldSimulator:
         self.grid = [(x, y) for x in range(self.grid_size) for y in range(self.grid_size)]
         self.start = start_coords
 
-        self.obstacles = self.generate_obstacles()
+        self.obstacles = self.generate_obstacles(obstacles)
         self.paths = []
 
-    def generate_obstacles(self):
-        obstacles = []
-        for _ in range(int(len(self.grid) * self.obstacle_chance)):
-            obstacle = random.choice(
-                [p for p in self.grid if p != self.start and p not in self.end_points]
-            )
-            if obstacle not in obstacles:
-                obstacles.append(obstacle)
+    def generate_obstacles(self, obstacle_list):
+        for i in obstacle_list:
+            obstacle_x = i.position.x * 2 + 10
+            obstacle_y = i.position.y * 2 + 10
+            obstacles.append((obstacle_x, obstacle_y))
         return obstacles
 
     def is_valid_position(self, position):
@@ -56,7 +55,7 @@ class SlimeMoldSimulator:
 
             for slime in slime_positions:
                 # Spread the slime in 4 cardinal directions (up, down, left, right)
-                for dx, dy in [(-0.5, 0), (0.5, 0), (0, -0.5), (0, 0.5)]:
+                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                     new_position = (slime[0] + dx, slime[1] + dy)
 
                     if self.is_valid_position(new_position) and new_position not in visited:
@@ -97,23 +96,24 @@ class SlimeMoldSimulator:
         fig, ax = plt.subplots(figsize=(10, 10))
 
         # Plot obstacles
-        obstacle_x, obstacle_y = zip(*self.obstacles) if self.obstacles else ([], [])
-        ax.scatter(
-            obstacle_x, obstacle_y, color=self.obstacle_color, s=10, marker='s', label="Obstacles"
+        for obstacle in self.obstacles:
+            obstacle_x, obstacle_y = obstacle
+            ax.scatter(
+                obstacle_x, obstacle_y, color=self.obstacle_color, s=500, marker='s', label="Obstacles"
         )
 
         # Plot nodes (start and end points)
         start_x, start_y = self.start
-        ax.scatter(start_x, start_y, color=self.start_node_color, s=50, label='Start')
+        ax.scatter(start_x, start_y, color=self.start_node_color, s=250, label='Start')
         for end in self.end_pointCoords:
             end_x, end_y = end
-            ax.scatter(end_x, end_y, color=self.end_node_color, s=50, label='End')
+            ax.scatter(end_x, end_y, color=self.end_node_color, s=250, label='End')
 
         # Plot slime paths
         for path in self.paths:
             if path:
                 path_x, path_y = zip(*path)
-                ax.plot(path_x, path_y, color=self.path_color, linewidth=1)
+                ax.plot(path_x, path_y, color=self.path_color, linewidth=2)
 
         # Label the plot
         ax.set_title("Slime Mold Algorithm Finding Paths to Multiple Endpoints in Grid")
@@ -123,7 +123,7 @@ class SlimeMoldSimulator:
         ax.xaxis.set(major_locator = ticker.MultipleLocator(5), minor_locator = ticker.MultipleLocator(1))
         ax.grid(which='major', alpha=0.5)
         ax.grid(which='minor', alpha=0.2, linestyle='--')
-        plt.xlim(0, 20)
-        plt.ylim(0, 20)
+        plt.xlim(-0.5, 20.5)
+        plt.ylim(-0.5, 20.5)
         plt.grid(True)
         plt.show()
