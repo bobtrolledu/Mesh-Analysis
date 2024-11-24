@@ -123,15 +123,24 @@ def show_popup(cube):
     elif cube.name == "Park":
         popup_data = 0
     elif cube.name == "Power Generation":
-        popup_data = 0
-    # Create the popup
+        popup_data = calculate_energy_usage()
+
+
+
+        # Create the popup
     popup_text = Text(
-        text=f"Building: {cube.name} \n Power consumption Intensity: {popup_data}",
+        text= if_power_text(cube, popup_data),
         position=(mouse.position.x + 0.1, mouse.position.y + 0.1),  # Adjust the position of the popup
         origin=(0, 0),
         scale=1,
         background=True
     )
+
+def if_power_text(cube, popup_data):
+    if cube.name == "Power Generation":
+        return f"{cube.name} \n Power Generation needed: {popup_data} kW/h"
+    else:
+        return f"{cube.name} \n Power consumption Intensity: {popup_data} kW/h"
 
 # Function to destroy the popup
 def destroy_popup():
