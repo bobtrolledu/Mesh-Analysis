@@ -411,13 +411,12 @@ def draw_heatmap():
             )
             heat_pixel[y].append(pixel)
 
-def update_heatmap():
+def update_heatmap(hour):
     global heat_pixel
-
+    simulate_button.text = f"Hour(s) " + str(hour)
     heatmap = HM.HeatMap(nodes=heatmap_nodes, power_weights=power_weights)
     heatmap.generate_heatmap()
     intensity_array = heatmap.get_intensity_array()
-    print(intensity_array)
     max_value = []
     for i in intensity_array:
         max_value.append(max(i))
@@ -436,12 +435,10 @@ def update_heatmap():
             if heat_pixel[y][x].get_intensity() != new_value:
                 heat_pixel[y][x].color = intensity_to_color(new_value)
                 heat_pixel[y][x].position = ((x - 20) / 4, (y  - 20) / 4, -(new_value/100) + 3)
-                print('here')
 
-def simulate(bias):
+def simulate(bias, hour):
     global low_value, medium_value, high_value, commercial_value, industrial_value
     if bias:
-        print('up')
         if low_value > 0:
             low_value -= 1
         if medium_value > 10:
@@ -453,7 +450,6 @@ def simulate(bias):
         if industrial_value < 50:
             industrial_value += 1
     else:
-        print('down')
         if low_value < 10:
             low_value += 1
         if medium_value < 20:
@@ -465,17 +461,17 @@ def simulate(bias):
         if industrial_value > 40:
             industrial_value -= 1
     update_power_weights()
-    update_heatmap()
+    update_heatmap(hour)
 
 
 
 def simulate_queue():
     for i in range(24):
         if i > 8 and i < 17:
-            invoke(lambda: simulate(1), delay=i/2)
+            invoke(lambda: simulate(1, i + 1), delay=i/4)
         else:
-            invoke(lambda: simulate(0), delay=i/2)
-
+            invoke(lambda: simulate(0, i + 1), delay=i/4)
+    simulate_button.text = f"Simulate!"
 
 def enable_wp():
     wp.enabled = True
@@ -485,13 +481,13 @@ def enable_wp():
 button_group = []
 
 # Define the buttons and add them to the group
-park = Button(model="quad", text = "Park", color=color.gray, position=(-0.74, 0.26), scale=(0.2, 0.1))
-low = Button(model="quad", text="Low Density", color=color.gray, position=(-0.74, 0.15), scale=(0.2, 0.1))
-medium = Button(model="quad", text="Medium Density", color=color.gray, position=(-0.74, 0.04), scale=(0.2, 0.1))
-high = Button(model="quad", text="High Density", color=color.gray, position=(-0.74, -0.07), scale=(0.2, 0.1))
-commercial = Button(model="quad", text = "Commercial", color=color.gray, position=(-0.74, -0.18), scale=(0.2, 0.1))
-industrial = Button(model="quad", text = "Industrial", color=color.gray, position=(-0.74, -0.29), scale=(0.2, 0.1))
-power = Button(model="quad", text = "Power", color=color.gray, position=(-0.74, -0.4), scale=(0.2, 0.1))
+park = Button(model="quad", text = "Green Space", color=color.gray, position=(-0.74, 0.30), scale=(0.2, 0.08))
+low = Button(model="quad", text="Low Density Housing", color=color.gray, position=(-0.74, 0.21), scale=(0.2, 0.08), text_size=0.75)
+medium = Button(model="quad", text="Medium Density Housing", color=color.gray, position=(-0.74, 0.12), scale=(0.2, 0.08), text_size=0.65)
+high = Button(model="quad", text="High Density Housing", color=color.gray, position=(-0.74, 0.03), scale=(0.2, 0.08), text_size=0.75)
+commercial = Button(model="quad", text = "Commercial District", color=color.gray, position=(-0.74, -0.06), scale=(0.2, 0.08), text_size=0.75)
+industrial = Button(model="quad", text = "Industrial District", color=color.gray, position=(-0.74, -0.15), scale=(0.2, 0.08), text_size=0.95)
+power = Button(model="quad", text = "Power Plant", color=color.gray, position=(-0.74, -0.24), scale=(0.2, 0.08))
 
 # Add buttons to the button group
 button_group.append(park)
@@ -542,45 +538,45 @@ def on_button_click(button):
 orthogonal = Button(
     model='quad',
     text="2D View",
-    color=color.azure,
-    scale=(0.2, 0.07),
-    position=(0.2, -0.43),
+    color=color.gray,
+    scale=(0.25, 0.1),
+    position=(0.745, 0.07),
     on_click=toggle_orthographic
 )
 
 simulate_button = Button(
     model='quad',
     text="Simulate!",
-    color=color.azure,
-    scale=(0.2, 0.07),
-    position=(0.6, -0.3),
+    color=color.gray,
+    scale=(0.25, 0.1),
+    position=(0.745, 0.20),
     on_click=simulate_queue
 )
 
 analyze_button = Button(
     model='quad',
-    text= "Analyze",
-    color=color.azure,
-    scale=(0.2, 0.07),
-    position=(-0.2, -0.43),
+    text= "Build Grid",
+    color=color.gray,
+    scale=(0.25, 0.1),
+    position=(0.745, -0.06),
     on_click=analyze_nodes
 )
 
 heatmap_button = Button(
     model='quad',
     text="Show Heatmap",
-    color=color.azure,
+    color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.6, -0.2),
+    position=(0.745, -0.19),
     on_click=draw_heatmap
 )
 
 parameters_button = Button(
     model='quad',
     text="Show Parameters",
-    color=color.azure,
+    color=color.hex("696fff"),
     scale=(0.25, 0.1),
-    position=(0.6, -0.1),
+    position=(-0.74, -0.37),
     on_click=enable_wp
 )
 
@@ -589,7 +585,26 @@ clear_all = Button(
     text="CLEAR ALL",
     color=color.hex("cf142b"),
     scale=(0.2, 0.07),
-    position=(0.6, -0.43),
+    position=(0.745, -0.43),
+    on_click=clear
+)
+
+sandbox = Button(
+    model='quad',
+    text="Sandbox",
+    color=color.hex("696fff"),
+    scale=(0.2, 0.07),
+    position=(-0.3, 0.45),
+    on_click=clear
+)
+
+data = Button(
+    model='quad',
+    text="Data Analytics",
+    color=color.hex("696fff"),
+    scale=(0.2, 0.07),
+    position=(0.3, 0.45),
+    z = 0,
     on_click=clear
 )
 
@@ -599,7 +614,7 @@ bar = Entity(
     color=color.hex("d3d3d3"),
     scale=(0.3, 1),
     position=(-.74, 0),
-    z = 12
+    z = 3
 )
 
 bar1 = Entity(
@@ -608,7 +623,7 @@ bar1 = Entity(
     color=color.hex("d3d3d3"),
     scale=(0.3, 1),
     position=(.74, 0),
-    z = 12
+    z = 3
 )
 
 toolbar = Entity(
@@ -617,7 +632,7 @@ toolbar = Entity(
     color=color.hex("d3d3d3"),
     scale=(2, 0.1),
     position=(0, 0.45),
-    z = 10
+    z = 2
 )
 
 shadow = Entity(
@@ -626,8 +641,18 @@ shadow = Entity(
     color=color.hex("555555"),
     scale=(2, 0.1),
     position=(0, 0.446),
-    z = 11
+    z = 3
 )
+
+logo = Entity(
+    parent=camera.ui,
+    model='quad',             # Flat 2D surface
+    texture='folder/logo.png', # Path to the PNG image
+    scale=(0.35, 0.05),             # Adjust width and height
+    position=(-0.70, 0.45),
+    z = 1# Position in the scene
+)
+
 
 # Create individual elements first
 low_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
