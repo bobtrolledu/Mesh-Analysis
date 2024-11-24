@@ -501,6 +501,7 @@ def display_graphs():
     for i in range(len(total_energy_use)):
         x.append(i + 1)
 
+    print(total_energy_use)
     print(x)
     plt.plot(x,total_energy_use)
     plt.show()
