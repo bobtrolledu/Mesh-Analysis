@@ -66,6 +66,7 @@ previous_mouse_position = Vec2(0, 0)  # Tracks the previous mouse position
 # Variables for the sidebar button
 orthographic_locked = True
 is_animating = False
+finished_simulating = False
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
@@ -513,6 +514,7 @@ def display_graphs():
         x.append(i+1)
 
     plt.plot(x, total_energy_use)
+    plt.title("Total Energy Use")
     buf = BytesIO()
     plt.savefig(buf, format='png', bbox_inches='tight')
     buf.seek(0)
@@ -545,7 +547,6 @@ def display_graphs():
 
 
 def simulate_queue():
-
     if not heat_pixel:
         print("No heatmap")
         return
@@ -756,7 +757,7 @@ logo = Entity(
 analysis_screen = Entity(
     parent=camera.ui,
     model='quad',
-    color=color.hex("d3d3d3"),
+    color=color.white,
     scale=(3, 3),
     position=(0, 0),
     z = -50,
