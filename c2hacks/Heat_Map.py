@@ -1,6 +1,10 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
+import display_plot as DP
+from PIL import Image
+from io import BytesIO
+from ursina import *
 
 class HeatMap:
     def __init__(self, nodes, power_weights):
@@ -75,6 +79,16 @@ class HeatMap:
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.gca().set_aspect('equal', adjustable='box')  # Maintain aspect ratio
+
+        buf = BytesIO()
+        plt.savefig(buf, format='png', bbox_inches='tight')
+        buf.seek(0)
+
+        # Convert the image to a texture
+        img = Image.open(buf)
+        texture = Texture(img)
+        buf.close()
+        DP.add_plot(texture)
 
     def get_intensity_array(self):
         return self.intensity_array

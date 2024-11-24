@@ -17,7 +17,7 @@ window.borderless = False
 window.show_ursina_splash = True
 scene.background_color = color.white
 
-nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel,total_energy_use = [],[],[],[],[],[],[],[],[]
+nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel,total_energy_use, plot_entity_list = [],[],[],[],[],[],[],[],[],[]
 
 power_node = None
 popup_text = None
@@ -497,14 +497,24 @@ def simulate(bias, hour):
     update_heatmap(hour)
 
 def display_graphs():
-    x =[]
-    for i in range(len(total_energy_use)):
-        x.append(i + 1)
+    textures = DP.display()
 
-    print(x)
-    plt.plot(x,total_energy_use)
-    plt.show()
-    #textures =  DP.display()
+    global plot_entity_list
+    for j in range(-1,2,1):
+        for i in textures:
+            plot_entity = Entity(
+                parent=camera.ui,
+                model='quad',
+                texture=i,
+                scale=(0.5, 0.5),  # Adjust scale as needed
+                position=(-0.4*j, 0, 0),  # Centered
+                visible = False,
+                z = -80
+            )
+            plot_entity_list.append(plot_entity)
+
+
+
 
 def simulate_queue():
 
@@ -527,9 +537,15 @@ def enable_analysis_interface():
     analysis_screen.collider = 'box'
     display_graphs()
 
+    for i in plot_entity_list:
+        i.visible = True
+
 def enable_sandbox_interface():
     analysis_screen.visible = False
     analysis_screen.collider = None
+
+    for i in plot_entity_list:
+        i.visible = False
 
 #UI
 # Create a group of buttons
