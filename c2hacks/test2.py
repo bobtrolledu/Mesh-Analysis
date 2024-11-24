@@ -172,8 +172,8 @@ def input(key):
                     elif mouse.hovered_entity is power_node:
                         hovered_cube = mouse.hovered_entity
                         power_node = None
-                        if not heatmap_nodes:
-                            heatmap_nodes.remove(hovered_cube)
+                        #if not heatmap_nodes:
+                        #    heatmap_nodes.remove(hovered_cube)
                         destroy(hovered_cube)
                     elif mouse.hovered_entity == grid:
                         add_entity()
@@ -255,6 +255,9 @@ def analyze_nodes():
 def draw_heatmap():
     heatmap = HM.HeatMap(nodes=heatmap_nodes)
     heatmap.generate_heatmap()
+
+def enable_wp():
+    wp.enabled = True
 
 #UI
 # Create a group of buttons
@@ -342,6 +345,15 @@ heatmap_button = Button(
     on_click=draw_heatmap
 )
 
+parameters_button = Button(
+    model='quad',
+    text="Show Parameters",
+    color=color.azure,
+    scale=(0.25, 0.1),
+    position=(0.6, -0.1),
+    on_click=enable_wp
+)
+
 bar = Entity(
     parent=camera.ui,
     model='quad',
@@ -350,6 +362,39 @@ bar = Entity(
     position=(-0.6, 0),
     z = 10
 )
+
+# Create individual elements first
+park_slider = ThinSlider()
+low_density_slider = ThinSlider()
+medium_density_slider = ThinSlider()
+high_density_slider = ThinSlider()
+commercial_slider = ThinSlider()
+industrial_slider = ThinSlider()
+power_generation_slider = ThinSlider()
+
+# Now define the window panel
+wp = WindowPanel(
+    title='Set Parameters',
+    content=(
+        Text("Park"),
+        park_slider,
+        Text("Low Density"),
+        low_density_slider,
+        Text("Medium Density"),
+        medium_density_slider,
+        Text("High Density"),
+        high_density_slider,
+        Text("Commercial"),
+        commercial_slider,
+        Text("Industrial"),
+        industrial_slider,
+        Text("Power Generation"),
+        power_generation_slider,
+    ),
+    popup=True
+)
+wp.y = wp.panel.scale_y / 2 * wp.scale_y    # center the window panel
+wp.layout()
 
 # Instructions for the user
 Text("Click LEFT MOUSE BUTTON to add a new entity at the mouse's X and Y position.", position=(0, 0.45), origin=(0, 0), scale=1.5)
