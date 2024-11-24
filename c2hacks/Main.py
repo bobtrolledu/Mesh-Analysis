@@ -9,7 +9,7 @@ from PIL import Image
 from io import BytesIO
 
 # Initialize the Ursina app
-app = Ursina(development_mode=True)
+app = Ursina(development_mode=False)
 # Set window size (width, height) in pixels
 window.size = (16*100, 9*100)  # Adjust the window size as needed
 window.title = "Energy Emulator"  # Set the window title
