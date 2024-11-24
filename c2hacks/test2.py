@@ -3,7 +3,8 @@ import Path_Finding as PF
 import Heat_Map as HM
 
 # Initialize the Ursina app
-app = Ursina()
+app = Ursina(development_mode=True)
+
 
 nodes = []
 obstacles = []
@@ -269,7 +270,7 @@ def reset_animation_flag():
 
 def analyze_nodes():
     global start
-    simulator = PF.SlimeMoldSimulator(grid_size=20, endpoints=nodes, obstacle_chance=0, start_coords=start)
+    simulator = PF.SlimeMoldSimulator(grid_size=20, endpoints=nodes, obstacle_chance=0, start_coords=start, obstacles=obstacles)
     simulator.run()
     simulator.plot()
 
@@ -373,7 +374,6 @@ bar = Entity(
 )
 
 # Instructions for the user
-Text("Click LEFT MOUSE BUTTON to add a new entity at the mouse's X and Y position.", position=(0, 0.45), origin=(0, 0), scale=1.5)
 grid = Entity(model=Grid(20, 20), scale=(10, 10, 1), color=color.light_gray, collider = 'box', position=(grid_shift_x, grid_shift_y, 0), receive_shadows = True)
 
 # Run the app
