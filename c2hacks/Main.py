@@ -308,13 +308,6 @@ def input(key):
             camera.fov = max(10, min(80, camera.fov))
             camera.fov += 500 * time.dt
 
-
-def orthographic_out_spin_animation():
-    pivot.animate('rotation_x', pivot.rotation_x - 50, duration=2, curve=curve.in_out_expo)
-
-def orthographic_in_spin_animation():
-    pivot.animate('rotation_x', pivot.rotation_x + 50, duration=2, curve=curve.in_out_expo)
-
 # Update function for handling rotation
 def update():
     global is_dragging, previous_mouse_position
@@ -353,16 +346,16 @@ def toggle_orthographic():
         orthographic_locked = not orthographic_locked  # Toggle the state
         camera.orthographic = orthographic_locked
         orthogonal.text = f"Go 2D"
-        camera.fov = 60
-        orthographic_out_spin_animation()
+        camera.animate('fov', value = 60, curve=curve.in_out_expo)
+        pivot.animate('rotation_x', pivot.rotation_x - 50, duration=2, curve=curve.in_out_expo)
         orthographic_locked = False
     else:
         orthographic_locked = not orthographic_locked  # Toggle the state
         camera.orthographic = orthographic_locked
         orthogonal.text = f"Go 3D"
         pivot_rotate.animate('rotation_z', pivot_rotate.rotation_z - pivot_rotate.rotation_z, duration=2, curve=curve.in_out_expo)
-        orthographic_in_spin_animation()
-        camera.fov = 15
+        pivot.animate('rotation_x', pivot.rotation_x + 50, duration=2, curve=curve.in_out_expo)
+        camera.animate('fov', value = 15, curve=curve.in_out_expo)
         orthographic_locked = True
 
     invoke(lambda: reset_animation_flag(), delay=2)
@@ -668,25 +661,25 @@ logo = Entity(
 
 
 # Create individual elements first
-low_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
-medium_density_slider = ThinSlider(10, 20, default=10, step=0.25, dynamic= False, on_value_changed = update_params)
-high_density_slider = ThinSlider(20, 30, default=20, step=0.25, dynamic= False, on_value_changed = update_params)
-commercial_slider = ThinSlider(30, 40, default=30, step=0.25, dynamic= False, on_value_changed = update_params)
-industrial_slider = ThinSlider(40, 50, default=40, step=0.25, dynamic= False, on_value_changed = update_params)
+low_density_slider = ThinSlider(1, 100, default=80, step=1, dynamic= False, on_value_changed = update_params)
+medium_density_slider = ThinSlider(1, 20, default=10, step=1, dynamic= False, on_value_changed = update_params)
+high_density_slider = ThinSlider(1, 15, default=3, step=1, dynamic= False, on_value_changed = update_params)
+commercial_slider = ThinSlider(1, 10, default=5, step=1, dynamic= False, on_value_changed = update_params)
+industrial_slider = ThinSlider(1, 3, default=1, step=1, dynamic= False, on_value_changed = update_params)
 
 # Now define the window panel
 wp = WindowPanel(
-    title='Set Parameters',
+    title='Set Zoning Density',
     content=(
-        Text("Low Density"),
+        Text("Households per Low Density Zone"),
         low_density_slider,
-        Text("Medium Density"),
+        Text("Apartments per Medium Density Zone"),
         medium_density_slider,
-        Text("High Density"),
+        Text("Apartments per High Density Zone"),
         high_density_slider,
-        Text("Commercial"),
+        Text("Shops per Commercial Zone"),
         commercial_slider,
-        Text("Industrial"),
+        Text("Factories per Industrial Zone"),
         industrial_slider
     ),
     popup=True
