@@ -31,6 +31,9 @@ def create_simple_texture(buffer):
     buffer.close()
     total_textures.append(texture)
 
+def add_plot(plot):
+    total_textures.append(plot)
+
 def display():
     return total_textures
 
