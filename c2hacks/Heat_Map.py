@@ -66,7 +66,7 @@ class HeatMap:
         intensity = np.array(intensity_list)
         self.intensity_array = intensity.tolist()
 
-        #self.plot_heatmap(x_mesh, y_mesh, intensity, building_colors, types, x, y)
+        self.plot_heatmap(x_mesh, y_mesh, intensity, building_colors, types, x, y)
 
     def plot_heatmap(self, x_mesh, y_mesh, intensity, building_colors, types, x, y):
         # Plot heatmap
@@ -92,6 +92,6 @@ class HeatMap:
         texture = Texture(img)
         buf.close()
         DP.add_plot(texture)
-
+        plt.figure().clear()
     def get_intensity_array(self):
         return self.intensity_array

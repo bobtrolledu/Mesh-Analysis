@@ -5,6 +5,8 @@ import heatpixel as HP
 import A_Star_Path_Finding as PF
 import display_plot as DP
 import matplotlib.pyplot as plt
+from PIL import Image
+from io import BytesIO
 
 # Initialize the Ursina app
 app = Ursina(development_mode=True)
@@ -495,22 +497,41 @@ def simulate(bias, hour):
     update_heatmap(hour)
 
 def display_graphs():
+
+    x = []
+
+    for i in range(24):
+        x.append(i+1)
+
+    plt.plot(x, total_energy_use)
+    buf = BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+
+    # Convert the image to a texture
+    img = Image.open(buf)
+    texture1 = Texture(img)
+    buf.close()
+    DP.add_plot(texture1)
+
     textures = DP.display()
 
-    global plot_entity_list
-    for j in range(-1,2,1):
-        for i in textures:
-            plot_entity = Entity(
-                parent=camera.ui,
-                model='quad',
-                texture=i,
-                scale=(0.5, 0.5),  # Adjust scale as needed
-                position=(-0.4*j, 0, 0),  # Centered
-                visible = False,
-                z = -80
-            )
-            plot_entity_list.append(plot_entity)
+    real_texture_list = [textures[0], textures[1], textures[-1]]
 
+    global plot_entity_list
+    counter = -1
+    for i in real_texture_list:
+        plot_entity = Entity(
+            parent=camera.ui,
+            model='quad',
+            texture=i,
+            scale=(0.5, 0.5),  # Adjust scale as needed
+            position=(-0.6 * counter, 0, 0),  # Centered
+            visible=False,
+            z=-80
+        )
+        counter += 1
+        plot_entity_list.append(plot_entity)
 
 
 
