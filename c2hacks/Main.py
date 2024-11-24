@@ -5,13 +5,14 @@ import Pipe_Animate as PA
 import heatpixel as HP
 
 # Initialize the Ursina app
-app = Ursina(development_mode=True)
+app = Ursina(development_mode=False)
 # Set window size (width, height) in pixels
 window.size = (16*100, 9*100)  # Adjust the window size as needed
 window.title = "Energy Emulator"  # Set the window title
 window.draggable = True
 window.resizable = True
 window.borderless = False
+window.show_ursina_splash = True
 scene.background_color = color.white
 
 nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel = [],[],[],[],[],[],[],[]
@@ -65,7 +66,6 @@ previous_mouse_position = Vec2(0, 0)  # Tracks the previous mouse position
 # Variables for the sidebar button
 orthographic_locked = True
 is_animating = False
-zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
@@ -129,7 +129,7 @@ def show_popup(cube):
         popup_data = 0
     # Create the popup
     popup_text = Text(
-        text=f"Building: {cube.name} \n Power consumption: {popup_data}",
+        text=f"Building: {cube.name} \n Power consumption Intensity: {popup_data}",
         position=(mouse.position.x + 0.1, mouse.position.y + 0.1),  # Adjust the position of the popup
         origin=(0, 0),
         scale=1,
@@ -299,6 +299,16 @@ def input(key):
     elif key == 'right mouse up':  # Stop dragging on right mouse up
         is_dragging = False
 
+    elif key == 'scroll up':
+        if not orthographic_locked:
+            camera.fov = max(10, min(80, camera.fov))
+            camera.fov -= 500 * time.dt
+    elif key == 'scroll down':
+        if not orthographic_locked:
+            camera.fov = max(10, min(80, camera.fov))
+            camera.fov += 500 * time.dt
+
+
 def orthographic_out_spin_animation():
     pivot.animate('rotation_x', pivot.rotation_x - 50, duration=2, curve=curve.in_out_expo)
 
@@ -328,6 +338,7 @@ def update():
 
         if not mouse.hovered_entity or mouse.hovered_entity is grid:
             destroy_popup()
+
 
 # Function to toggle orthographic view
 def toggle_orthographic():
