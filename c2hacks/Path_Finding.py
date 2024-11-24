@@ -1,4 +1,3 @@
-import random
 import matplotlib.pyplot as plt
 from matplotlib import ticker
 

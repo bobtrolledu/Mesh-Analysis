@@ -1,8 +1,8 @@
 from ursina import *
-import Path_Finding as PF
 import Heat_Map as HM
 import Pipe_Animate as PA
 import heatpixel as HP
+import A_Star_Path_Finding as PF
 
 # Initialize the Ursina app
 app = Ursina(development_mode=True)
@@ -362,13 +362,11 @@ def reset_animation_flag():
 
 def analyze_nodes():
     global start, paths, pipes
-    simulator = PF.SlimeMoldSimulator(grid_size=20, endpoints=nodes, obstacle_chance=0, start_coords=start, obstacles=obstacles)
-    simulator.clear()
-    simulator.run()
-    simulator.plot()
-    paths = simulator.get_path()
-    for i in pipes:
-        destroy(i)
+    obstacle_coord = []
+    for i in obstacles:
+        obstacle_coord.append(((i.position.x * 2 + 10), (i.position.y * 2) + 10))
+    paths = PF.set_starting(obstacle_coord, start, nodes)
+    PF.plot(obstacle_coord, start)
     animate_line()
 
 def map_range(x, in_min, in_max, out_min, out_max):
@@ -468,8 +466,6 @@ def simulate(bias, hour):
             industrial_value -= 1
     update_power_weights()
     update_heatmap(hour)
-
-
 
 def simulate_queue():
     for i in range(24):
