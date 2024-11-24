@@ -5,7 +5,7 @@ import heatpixel as HP
 import A_Star_Path_Finding as PF
 
 # Initialize the Ursina app
-app = Ursina(development_mode=False)
+app = Ursina(development_mode=True)
 # Set window size (width, height) in pixels
 window.size = (16*100, 9*100)  # Adjust the window size as needed
 window.title = "Energy Emulator"  # Set the window title
@@ -509,7 +509,12 @@ def enable_wp():
     wp.enabled = True
 
 def enable_analysis_interface():
-    return
+    analysis_screen.visible = True
+    analysis_screen.collider = 'box'
+
+def enable_sandbox_interface():
+    analysis_screen.visible = False
+    analysis_screen.collider = None
 
 #UI
 # Create a group of buttons
@@ -630,7 +635,8 @@ sandbox = Button(
     color=color.hex("696fff"),
     scale=(0.2, 0.07),
     position=(-0.3, 0.45),
-    on_click=clear
+    on_click=enable_sandbox_interface,
+    z = -100
 )
 
 data = Button(
@@ -639,8 +645,8 @@ data = Button(
     color=color.hex("696fff"),
     scale=(0.2, 0.07),
     position=(0.3, 0.45),
-    z = 0,
-    on_click=calculate_energy_usage
+    z = -100,
+    on_click=enable_analysis_interface
 )
 
 bar = Entity(
@@ -685,9 +691,19 @@ logo = Entity(
     texture='folder/logo.png', # Path to the PNG image
     scale=(0.35, 0.05),             # Adjust width and height
     position=(-0.70, 0.45),
-    z = 1# Position in the scene
+    z = -200# Position in the scene
 )
 
+analysis_screen = Entity(
+    parent=camera.ui,
+    model='quad',
+    color=color.hex("d3d3d3"),
+    scale=(3, 3),
+    position=(0, 0),
+    z = -50,
+    collider = None,
+    visible = False,
+)
 
 # Create individual elements first
 low_density_slider = ThinSlider(1, 100, default=80, step=1, dynamic= False, on_value_changed = update_params)
