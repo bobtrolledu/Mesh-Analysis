@@ -31,11 +31,6 @@ class HeatMap:
 
         # KDE parameters
         h = 4  # Increased radius of influence
-        grid_size = 40  # Fixed resolution
-
-        # Define grid bounds with padding
-        x_min, x_max = min(x), max(x)
-        y_min, y_max = min(y), max(y)
 
         # Create grid
         x_grid, y_grid = [], []

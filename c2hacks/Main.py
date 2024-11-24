@@ -2,20 +2,15 @@ from ursina import *
 import Path_Finding as PF
 import Heat_Map as HM
 import Pipe_Animate as PA
-import time
+import heatpixel as HP
 
 # Initialize the Ursina app
 app = Ursina(development_mode=True)
+scene.background_color = color.white
 
-nodes = []
-paths = []
-pipes = []
-initial_path = []
-draw_path = []
-obstacles = []
+nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel = [],[],[],[],[],[],[],[]
+
 power_node = None
-heatmap_nodes = []
-
 popup_text = None
 
 ambient = AmbientLight()
@@ -32,20 +27,20 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 type = "low"
 
 low_value = 5.0
-medium_value = 5.0
-high_value = 5.0
-industrial_value = 5.0
-commercial_value = 5.0
+medium_value = 10.0
+high_value = 20.0
+commercial_value = 30.0
+industrial_value = 40.0
 
 power_weights = {
-            "low": low_value,
-            "medium": medium_value,
-            "high": high_value,
-            "commercial": industrial_value,
-            "industrial": commercial_value,
-            "park": 0,
-            "power": 0
-        }
+    "low": low_value,
+    "medium": medium_value,
+    "high": high_value,
+    "commercial": commercial_value,
+    "industrial": industrial_value,
+    "park": 0,
+    "power": 0
+}
 
 pivot = Entity()
 pivot_rotate = Entity()
@@ -68,11 +63,6 @@ zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
-    """print(Vec3(
-        round(position.x / grid_size) * grid_size,
-        round(position.y / grid_size) * grid_size,
-        round(position.z / grid_size) * grid_size
-    ))"""
     return Vec3(
         round(position.x / grid_size) * grid_size,
         round(position.y / grid_size) * grid_size,
@@ -90,11 +80,24 @@ def update_params():
         "low": low_value,
         "medium": medium_value,
         "high": high_value,
-        "commercial": industrial_value,
-        "industrial": commercial_value,
+        "commercial": commercial_value,
+        "industrial": industrial_value,
         "park": 0,
         "power": 0
     }
+
+def update_power_weights():
+    global low_value, medium_value, high_value, commercial_value, industrial_value, power_weights
+    power_weights = {
+        "low": low_value,
+        "medium": medium_value,
+        "high": high_value,
+        "commercial": commercial_value,
+        "industrial": industrial_value,
+        "park": 0,
+        "power": 0
+    }
+
 
 # Function to show a popup with the building's name
 def show_popup(cube):
@@ -133,7 +136,6 @@ def destroy_popup():
     if popup_text:
         destroy(popup_text)
         popup_text = None
-
 
 def add_cube(position):
     global type, power_node, obstacles, nodes
@@ -187,12 +189,13 @@ def add_cube(position):
         Look = 'folder/market.obj'
     else:
         Look = 'cube'
+
     if name == "Industrial Building":
         snapped_position = snapped_position - (0, 0, -0.25)
     if name == "Park":
         snapped_position = snapped_position - (0, 0, -0.1)
-    cube = Entity(
 
+    cube = Entity(
         model = Look, double_sided = True,
         color = current_color,
         position = snapped_position - (0, 0, size[2] / 2),
@@ -226,7 +229,8 @@ def add_entity():
     add_cube(position = mouse.position * camera.fov)
 
 def animate_line():
-    global paths, draw_path, initial_path, pipes
+    global paths, draw_path
+    draw_path = []
     for i in paths:
         for j in i:
             x, y = j
@@ -237,13 +241,30 @@ def animate_line():
         pipes.append(new_pipe.get_pipe())
         draw_path = []
 
+def clear():
+    global nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel, power, power_node
+    for i in nodes:
+        destroy(i)
+    for i in pipes:
+        destroy(i)
+    for i in draw_path:
+        destroy(i)
+    for i in obstacles:
+        destroy(i)
+    for i in heatmap_nodes:
+        destroy(i)
+    for i in heat_pixel:
+        for x in i:
+            destroy(x)
+    nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel = [],[],[],[],[],[],[],[]
+    power_node = None
 
 # Input handling
 def input(key):
     global is_dragging, previous_mouse_position, power_node
 
     if key == 'left mouse down':  # Add a new entity on left mouse click
-        if mouse.hovered_entity != button:
+        if mouse.hovered_entity != orthogonal:
             if mouse.hovered_entity not in button_group:
                 if orthographic_locked:
                     if mouse.hovered_entity in nodes:
@@ -265,7 +286,7 @@ def input(key):
                     elif mouse.hovered_entity == grid:
                         add_entity()
     elif key == 'right mouse down':  # Start dragging on right mouse down
-        if mouse.hovered_entity != button:
+        if mouse.hovered_entity != orthogonal:
             if not orthographic_locked:
                 is_dragging = True
                 previous_mouse_position = Vec2(mouse.x, mouse.y)  # Store the starting mouse position
@@ -314,14 +335,14 @@ def toggle_orthographic():
     if orthographic_locked:
         orthographic_locked = not orthographic_locked  # Toggle the state
         camera.orthographic = orthographic_locked
-        button.text = f"Orthographic: Off"
+        orthogonal.text = f"3D View"
         camera.fov = 60
         orthographic_out_spin_animation()
         orthographic_locked = False
     else:
         orthographic_locked = not orthographic_locked  # Toggle the state
         camera.orthographic = orthographic_locked
-        button.text = f"Orthographic: On"
+        orthogonal.text = f"2D View"
         pivot_rotate.animate('rotation_z', pivot_rotate.rotation_z - pivot_rotate.rotation_z, duration=2, curve=curve.in_out_expo)
         orthographic_in_spin_animation()
         camera.fov = 15
@@ -336,6 +357,7 @@ def reset_animation_flag():
 def analyze_nodes():
     global start, paths, pipes
     simulator = PF.SlimeMoldSimulator(grid_size=20, endpoints=nodes, obstacle_chance=0, start_coords=start, obstacles=obstacles)
+    simulator.clear()
     simulator.run()
     simulator.plot()
     paths = simulator.get_path()
@@ -348,10 +370,6 @@ def map_range(x, in_min, in_max, out_min, out_max):
 
 # Function to map intensity to a color gradient
 def intensity_to_color(value):
-    """
-    Map a normalized intensity value (0.0 to 1.0) to a gradient color
-    from blue (low) to red (high) via green, yellow, and orange.
-    """
     value = value/255
 
     if value <= 0.25:
@@ -364,6 +382,7 @@ def intensity_to_color(value):
         return lerp(color.orange, color.red, (value - 0.75) * 4)  # Orange to Red
 
 def draw_heatmap():
+    global heat_pixel
     heatmap = HM.HeatMap(nodes=heatmap_nodes,power_weights=power_weights)
     heatmap.generate_heatmap()
     intensity_array = heatmap.get_intensity_array()
@@ -379,18 +398,83 @@ def draw_heatmap():
             new_i.append(map_range(j, 0, max(max_value), 0, 255))
         normalized_intensity_array.append(new_i)
 
-    grid_size = len(normalized_intensity_array)
-
     for y, row in enumerate(normalized_intensity_array, 0):
+        heat_pixel.append([])
         for x, value in enumerate(row, 0):
             color_value = intensity_to_color(value)
-            #print((xy - 20)/4)
-            Entity(
+            pixel = HP.heatpixel(
                 model="cube",
                 color=color_value,
-                position= ((x - 20) / 4, (y  - 20) / 4, -value/100 + 5),  # Adjust position for grid layout
-                scale=(1/4, 1/4, 1)
+                position= ((x - 20) / 4, (y  - 20) / 4, -(value/100) + 3),  # Adjust position for grid layout
+                scale=(1/4, 1/4, 1),
+                value=value
             )
+            heat_pixel[y].append(pixel)
+
+def update_heatmap():
+    global heat_pixel
+
+    heatmap = HM.HeatMap(nodes=heatmap_nodes, power_weights=power_weights)
+    heatmap.generate_heatmap()
+    intensity_array = heatmap.get_intensity_array()
+    print(intensity_array)
+    max_value = []
+    for i in intensity_array:
+        max_value.append(max(i))
+
+    normalized_intensity_array = []
+
+    for i in intensity_array:
+        new_i = []
+        for j in i:
+            new_i.append(map_range(j, 0, max(max_value), 0, 255))
+        normalized_intensity_array.append(new_i)
+
+    for y in range(41):
+        for x in range(41):
+            new_value = normalized_intensity_array[y][x]
+            if heat_pixel[y][x].get_intensity() != new_value:
+                heat_pixel[y][x].color = intensity_to_color(new_value)
+                heat_pixel[y][x].position = ((x - 20) / 4, (y  - 20) / 4, -(new_value/100) + 3)
+                print('here')
+
+def simulate(bias):
+    global low_value, medium_value, high_value, commercial_value, industrial_value
+    if bias:
+        print('up')
+        if low_value > 0:
+            low_value -= 1
+        if medium_value > 10:
+            medium_value -= 1
+        if high_value > 20:
+            high_value -= 1
+        if commercial_value < 40:
+            commercial_value += 1
+        if industrial_value < 50:
+            industrial_value += 1
+    else:
+        print('down')
+        if low_value < 10:
+            low_value += 1
+        if medium_value < 20:
+            medium_value += 1
+        if high_value < 30:
+            high_value += 1
+        if commercial_value > 30:
+            commercial_value -= 1
+        if industrial_value > 40:
+            industrial_value -= 1
+    update_power_weights()
+    update_heatmap()
+
+
+
+def simulate_queue():
+    for i in range(24):
+        if i > 8 and i < 17:
+            invoke(lambda: simulate(1), delay=i/2)
+        else:
+            invoke(lambda: simulate(0), delay=i/2)
 
 
 def enable_wp():
@@ -401,13 +485,13 @@ def enable_wp():
 button_group = []
 
 # Define the buttons and add them to the group
-park = Button(model="quad", text = "Park", color=color.gray, position=(-0.6, 0.3), scale=(0.2, 0.1))
-low = Button(model="quad", text="Low Density", color=color.gray, position=(-0.6, 0.2), scale=(0.2, 0.1))
-medium = Button(model="quad", text="Medium Density", color=color.gray, position=(-0.6, 0.1), scale=(0.2, 0.1))
-high = Button(model="quad", text="High Density", color=color.gray, position=(-0.6, 0), scale=(0.2, 0.1))
-commercial = Button(model="quad", text = "Commercial", color=color.gray, position=(-0.6, -0.1), scale=(0.2, 0.1))
-industrial = Button(model="quad", text = "Industrial", color=color.gray, position=(-0.6, -0.2), scale=(0.2, 0.1))
-power = Button(model="quad", text = "Power", color=color.gray, position=(-0.6, -0.3), scale=(0.2, 0.1))
+park = Button(model="quad", text = "Park", color=color.gray, position=(-0.74, 0.26), scale=(0.2, 0.1))
+low = Button(model="quad", text="Low Density", color=color.gray, position=(-0.74, 0.15), scale=(0.2, 0.1))
+medium = Button(model="quad", text="Medium Density", color=color.gray, position=(-0.74, 0.04), scale=(0.2, 0.1))
+high = Button(model="quad", text="High Density", color=color.gray, position=(-0.74, -0.07), scale=(0.2, 0.1))
+commercial = Button(model="quad", text = "Commercial", color=color.gray, position=(-0.74, -0.18), scale=(0.2, 0.1))
+industrial = Button(model="quad", text = "Industrial", color=color.gray, position=(-0.74, -0.29), scale=(0.2, 0.1))
+power = Button(model="quad", text = "Power", color=color.gray, position=(-0.74, -0.4), scale=(0.2, 0.1))
 
 # Add buttons to the button group
 button_group.append(park)
@@ -455,21 +539,30 @@ def on_button_click(button):
     elif button == power:
         type = "power"
 
-button = Button(
+orthogonal = Button(
     model='quad',
-    text="Orthographic: On",
+    text="2D View",
     color=color.azure,
-    scale=(0.25, 0.1),
-    position=(0.6, -0.4),  # Adjust position to act as a sidebar
+    scale=(0.2, 0.07),
+    position=(0.2, -0.43),
     on_click=toggle_orthographic
+)
+
+simulate_button = Button(
+    model='quad',
+    text="Simulate!",
+    color=color.azure,
+    scale=(0.2, 0.07),
+    position=(0.6, -0.3),
+    on_click=simulate_queue
 )
 
 analyze_button = Button(
     model='quad',
     text= "Analyze",
     color=color.azure,
-    scale=(0.25, 0.1),
-    position=(0.6, -0.3),
+    scale=(0.2, 0.07),
+    position=(-0.2, -0.43),
     on_click=analyze_nodes
 )
 
@@ -491,21 +584,57 @@ parameters_button = Button(
     on_click=enable_wp
 )
 
+clear_all = Button(
+    model='quad',
+    text="CLEAR ALL",
+    color=color.hex("cf142b"),
+    scale=(0.2, 0.07),
+    position=(0.6, -0.43),
+    on_click=clear
+)
+
 bar = Entity(
     parent=camera.ui,
     model='quad',
-    color=color.random_color(),
+    color=color.hex("d3d3d3"),
     scale=(0.3, 1),
-    position=(-0.6, 0),
+    position=(-.74, 0),
+    z = 12
+)
+
+bar1 = Entity(
+    parent=camera.ui,
+    model='quad',
+    color=color.hex("d3d3d3"),
+    scale=(0.3, 1),
+    position=(.74, 0),
+    z = 12
+)
+
+toolbar = Entity(
+    parent=camera.ui,
+    model='quad',
+    color=color.hex("d3d3d3"),
+    scale=(2, 0.1),
+    position=(0, 0.45),
     z = 10
+)
+
+shadow = Entity(
+    parent=camera.ui,
+    model='quad',
+    color=color.hex("555555"),
+    scale=(2, 0.1),
+    position=(0, 0.446),
+    z = 11
 )
 
 # Create individual elements first
 low_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
-medium_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
-high_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
-commercial_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
-industrial_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+medium_density_slider = ThinSlider(10, 20, default=10, step=0.25, dynamic= False, on_value_changed = update_params)
+high_density_slider = ThinSlider(20, 30, default=20, step=0.25, dynamic= False, on_value_changed = update_params)
+commercial_slider = ThinSlider(30, 40, default=30, step=0.25, dynamic= False, on_value_changed = update_params)
+industrial_slider = ThinSlider(40, 50, default=40, step=0.25, dynamic= False, on_value_changed = update_params)
 
 # Now define the window panel
 wp = WindowPanel(

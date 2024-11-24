@@ -130,3 +130,7 @@ class SlimeMoldSimulator:
 
     def get_path(self):
         return self.paths
+
+    def clear(self):
+        global obstacles, end_pointCoords
+        end_pointCoords, obstacles, paths, parent_map = [], [], [], []
