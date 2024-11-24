@@ -513,6 +513,7 @@ def simulate(bias, hour):
     total_energy_use.append(calculate_energy_usage())
     update_power_weights()
     update_heatmap(hour)
+    print(hour)
 
 def display_graphs():
 
@@ -578,6 +579,9 @@ def simulate_queue():
         else:
             invoke(lambda: simulate(0, i + 1), delay=i/4)
     simulate_button.text = f"Simulate!"
+
+
+
     print("donee!!")
 
 def enable_wp():
