@@ -1,5 +1,6 @@
 from ursina import *
 import Path_Finding as PF
+import Heat_Map as HM
 
 # Initialize the Ursina app
 app = Ursina()
@@ -7,6 +8,7 @@ app = Ursina()
 nodes = []
 obstacles = []
 power_node = None
+heatmap_nodes = []
 
 popup_text = None
 
@@ -20,9 +22,6 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 #light2 = PointLight(position=Vec3(6, -6, 10))
 #light3 = PointLight(position=Vec3(-6, 6, 10))
 #light4 = PointLight(position=Vec3(6, 6, 10))
-
-
-
 
 type = "low"
 
@@ -47,6 +46,11 @@ zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
+    print(Vec3(
+        round(position.x / grid_size) * grid_size,
+        round(position.y / grid_size) * grid_size,
+        round(position.z / grid_size) * grid_size
+    ))
     return Vec3(
         round(position.x / grid_size) * grid_size,
         round(position.y / grid_size) * grid_size,
@@ -141,11 +145,13 @@ def add_cube(position):
         cast_shadows = True
     )
 
+    heatmap_nodes.append(cube)
+
     if type == "power":
         if power_node is None:
             global start
             power_node = cube
-            start = (cube.position.x + (5 - grid_shift_x), cube.position.y + (5 - grid_shift_y))
+            start = (cube.position.x * 2 + 10, cube.position.y * 2 + 10)
         else:
             destroy(cube)
             return
@@ -173,14 +179,18 @@ def input(key):
                     if mouse.hovered_entity in nodes:
                         hovered_cube = mouse.hovered_entity
                         nodes.remove(hovered_cube)
+                        heatmap_nodes.remove(hovered_cube)
                         destroy(hovered_cube)
                     elif mouse.hovered_entity in obstacles:
                         hovered_cube = mouse.hovered_entity
                         obstacles.remove(hovered_cube)
+                        heatmap_nodes.remove(hovered_cube)
                         destroy(hovered_cube)
                     elif mouse.hovered_entity is power_node:
                         hovered_cube = mouse.hovered_entity
                         power_node = None
+                        if not heatmap_nodes:
+                            heatmap_nodes.remove(hovered_cube)
                         destroy(hovered_cube)
                     elif mouse.hovered_entity == grid:
                         add_entity()
@@ -255,9 +265,13 @@ def reset_animation_flag():
 
 def analyze_nodes():
     global start
-    simulator = PF.SlimeMoldSimulator(grid_size=10, endpoints=nodes, obstacle=obstacles, start_coords=start)
+    simulator = PF.SlimeMoldSimulator(grid_size=20, endpoints=nodes, obstacle_chance=0, start_coords=start)
     simulator.run()
     simulator.plot()
+
+def draw_heatmap():
+    heatmap = HM.HeatMap(nodes=heatmap_nodes)
+    heatmap.generate_heatmap()
 
 #UI
 # Create a group of buttons
@@ -334,6 +348,15 @@ analyze_button = Button(
     scale=(0.25, 0.1),
     position=(0.6, -0.3),
     on_click=analyze_nodes
+)
+
+heatmap_button = Button(
+    model='quad',
+    text="Show Heatmap",
+    color=color.azure,
+    scale=(0.25, 0.1),
+    position=(0.6, -0.2),
+    on_click=draw_heatmap
 )
 
 bar = Entity(

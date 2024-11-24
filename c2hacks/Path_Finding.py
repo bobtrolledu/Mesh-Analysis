@@ -1,23 +1,19 @@
+import random
 import matplotlib.pyplot as plt
+from matplotlib import ticker
 
 end_pointCoords = []
-obstacle_coords = []
-obstacle, obstacles = [], []
 
 class SlimeMoldSimulator:
 
-    def __init__(self, grid_size, endpoints, obstacle, start_coords):
-        self.obstacles = obstacles
+    def __init__(self, grid_size, endpoints, obstacle_chance, start_coords):
         self.end_pointCoords = end_pointCoords
         self.grid_size = grid_size + 1
         self.endpoints = endpoints
         for i in endpoints:
-            end_pointCoords.append((i.position.x, i.position.y + 5))
+            end_pointCoords.append((i.position.x *2 + 10, i.position.y *2 + 10))
 
-        self.obstacle = obstacle
-        for i in obstacle:
-            obstacle_coords.append((i.position.x, i.position.y + 5))
-
+        self.obstacle_chance = obstacle_chance
         # Constants
         self.start_node_color = 'red'
         self.end_node_color = 'green'
@@ -29,16 +25,19 @@ class SlimeMoldSimulator:
         self.grid = [(x, y) for x in range(self.grid_size) for y in range(self.grid_size)]
         self.start = start_coords
 
+        self.obstacles = self.generate_obstacles()
         self.paths = []
-    '''
+
     def generate_obstacles(self):
-        global obstacle, obstacles
-        for i in obstacle_coords:
-            obstacle = (i.position.x, i.position.y)
-            if (i.position.x, i.position.y + 5) not in obstacles:
-                obstacles.append((i.position.x, i.position.y  + 5))
-        return
-    '''
+        obstacles = []
+        for _ in range(int(len(self.grid) * self.obstacle_chance)):
+            obstacle = random.choice(
+                [p for p in self.grid if p != self.start and p not in self.end_points]
+            )
+            if obstacle not in obstacles:
+                obstacles.append(obstacle)
+        return obstacles
+
     def is_valid_position(self, position):
         """Check if the position is valid (within grid and not an obstacle)."""
         if position not in self.obstacles:
@@ -57,7 +56,7 @@ class SlimeMoldSimulator:
 
             for slime in slime_positions:
                 # Spread the slime in 4 cardinal directions (up, down, left, right)
-                for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                for dx, dy in [(-0.5, 0), (0.5, 0), (0, -0.5), (0, 0.5)]:
                     new_position = (slime[0] + dx, slime[1] + dy)
 
                     if self.is_valid_position(new_position) and new_position not in visited:
@@ -118,10 +117,13 @@ class SlimeMoldSimulator:
 
         # Label the plot
         ax.set_title("Slime Mold Algorithm Finding Paths to Multiple Endpoints in Grid")
-        #ax.legend(loc="best")
-        ax.set_xlim(-0.5, self.grid_size - 0.5)
-        ax.set_ylim(-0.5, self.grid_size - 0.5)
         ax.set_xlabel("X Coordinate")
         ax.set_ylabel("Y Coordinate")
-        plt.grid(False)
+        ax.yaxis.set(major_locator = ticker.MultipleLocator(5), minor_locator = ticker.MultipleLocator(1))
+        ax.xaxis.set(major_locator = ticker.MultipleLocator(5), minor_locator = ticker.MultipleLocator(1))
+        ax.grid(which='major', alpha=0.5)
+        ax.grid(which='minor', alpha=0.2, linestyle='--')
+        plt.xlim(0, 20)
+        plt.ylim(0, 20)
+        plt.grid(True)
         plt.show()
