@@ -30,6 +30,22 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 
 type = "low"
 
+low_value = 5.0
+medium_value = 5.0
+high_value = 5.0
+industrial_value = 5.0
+commercial_value = 5.0
+
+power_weights = {
+            "low": low_value,
+            "medium": medium_value,
+            "high": high_value,
+            "commercial": industrial_value,
+            "industrial": commercial_value,
+            "park": 0,
+            "power": 0
+        }
+
 pivot = Entity()
 pivot_rotate = Entity()
 camera.orthographic = True
@@ -62,17 +78,48 @@ def snap_to_grid(position, grid_size):
         round(position.z / grid_size) * grid_size
     )
 
+def update_params():
+    global low_value, medium_value, high_value, commercial_value, industrial_value, power_weights
+    low_value = round(low_density_slider.value, 4)
+    medium_value = round(medium_density_slider.value, 4)
+    high_value = round(high_density_slider.value, 4)
+    commercial_value = round(commercial_slider.value, 4)
+    industrial_value = round(industrial_slider.value, 4)
+    power_weights = {
+        "low": low_value,
+        "medium": medium_value,
+        "high": high_value,
+        "commercial": industrial_value,
+        "industrial": commercial_value,
+        "park": 0,
+        "power": 0
+    }
+
 # Function to show a popup with the building's name
 def show_popup(cube):
-    global popup_text
+    global popup_text, low_value, medium_value, high_value, commercial_value, industrial_value
 
     # If a popup already exists, destroy it
     if popup_text:
         destroy(popup_text)
 
+    if cube.name == "Low Density Building":
+        data = low_value
+    elif cube.name == "Medium Density Building":
+        data = medium_value
+    elif cube.name == "High Density Building":
+        data = high_value
+    elif cube.name == "Commercial Building":
+        data = commercial_value
+    elif cube.name == "Industrial Building":
+        data = industrial_value
+    elif cube.name == "Park":
+        data = 0
+    elif cube.name == "Power Generation":
+        data = 0
     # Create the popup
     popup_text = Text(
-        text=f"Building: {cube.name}",
+        text=f"Building: {cube.name} \n Power consumption: {data}",
         position=(mouse.position.x + 0.1, mouse.position.y + 0.1),  # Adjust the position of the popup
         origin=(0, 0),
         scale=1,
@@ -117,7 +164,7 @@ def add_cube(position):
     elif type == "park":
         size = (0.5, 0.5, 0.5)
         current_color = color.hex("629460")
-        name = "Park Building"
+        name = "Park"
     elif type == "power":
         size = (0.5, 0.5, 1)
         current_color = color.magenta
@@ -127,7 +174,7 @@ def add_cube(position):
         Look = 'folder/house.obj'
     elif name == "Medium Density Building":
         Look = 'folder/medium.obj'
-    elif name == "Park Building":
+    elif name == "Park":
         Look = 'folder/park.obj'
     elif name == "Industrial Building":
         Look = 'folder/industrial.obj'
@@ -141,7 +188,7 @@ def add_cube(position):
         Look = 'cube'
     if name == "Industrial Building":
         snapped_position = snapped_position - (0, 0, -0.25)
-    if name == "Park Building":
+    if name == "Park":
         snapped_position = snapped_position - (0, 0, -0.1)
     cube = Entity(
 
@@ -189,6 +236,7 @@ def animate_line():
         pipes.append(new_pipe.get_pipe())
         draw_path = []
 
+
 # Input handling
 def input(key):
     global is_dragging, previous_mouse_position, power_node
@@ -210,8 +258,8 @@ def input(key):
                     elif mouse.hovered_entity is power_node:
                         hovered_cube = mouse.hovered_entity
                         power_node = None
-                        if not heatmap_nodes:
-                            heatmap_nodes.remove(hovered_cube)
+                        #if not heatmap_nodes:
+                        #    heatmap_nodes.remove(hovered_cube)
                         destroy(hovered_cube)
                     elif mouse.hovered_entity == grid:
                         add_entity()
@@ -295,8 +343,11 @@ def analyze_nodes():
     animate_line()
 
 def draw_heatmap():
-    heatmap = HM.HeatMap(nodes=heatmap_nodes)
+    heatmap = HM.HeatMap(nodes=heatmap_nodes,power_weights=power_weights)
     heatmap.generate_heatmap()
+
+def enable_wp():
+    wp.enabled = True
 
 #UI
 # Create a group of buttons
@@ -384,6 +435,15 @@ heatmap_button = Button(
     on_click=draw_heatmap
 )
 
+parameters_button = Button(
+    model='quad',
+    text="Show Parameters",
+    color=color.azure,
+    scale=(0.25, 0.1),
+    position=(0.6, -0.1),
+    on_click=enable_wp
+)
+
 bar = Entity(
     parent=camera.ui,
     model='quad',
@@ -392,6 +452,33 @@ bar = Entity(
     position=(-0.6, 0),
     z = 10
 )
+
+# Create individual elements first
+low_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+medium_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+high_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+commercial_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+industrial_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+
+# Now define the window panel
+wp = WindowPanel(
+    title='Set Parameters',
+    content=(
+        Text("Low Density"),
+        low_density_slider,
+        Text("Medium Density"),
+        medium_density_slider,
+        Text("High Density"),
+        high_density_slider,
+        Text("Commercial"),
+        commercial_slider,
+        Text("Industrial"),
+        industrial_slider
+    ),
+    popup=True
+)
+wp.y = wp.panel.scale_y / 2 * wp.scale_y    # center the window panel
+wp.layout()
 
 # Instructions for the user
 grid = Entity(model=Grid(20, 20), scale=(10, 10, 1), color=color.light_gray, collider = 'box', position=(grid_shift_x, grid_shift_y, 0), receive_shadows = True)
