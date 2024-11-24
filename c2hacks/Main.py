@@ -376,6 +376,23 @@ def analyze_nodes():
     PF.plot(obstacle_coord, start)
     animate_line()
 
+def calculate_energy_usage():
+    global nodes
+
+    sum = 0;
+
+    for node in nodes:
+        if node.name == "Low Density Building":
+
+        elif node.name == "Medium Density Building":
+
+        elif node.name == "High Density Building":
+
+        elif node.name == "Commercial Building":
+
+        elif node.name == "Industrial Building":
+
+
 def map_range(x, in_min, in_max, out_min, out_max):
   return (x - in_min) * (out_max - out_min) // (in_max - in_min) + out_min
 
@@ -489,6 +506,9 @@ def simulate_queue():
 
 def enable_wp():
     wp.enabled = True
+
+def enable_analysis_interface():
+
 
 #UI
 # Create a group of buttons
