@@ -195,7 +195,7 @@ def plot(obstacles, start_coords):
             ax.plot(path_x, path_y, color='blue', linewidth=2)
 
     # Label the plot
-    ax.set_title("Slime Mold Algorithm Finding Paths to Multiple Endpoints in Grid")
+    ax.set_title("A* Path Finding Algorithm to Multiple Endpoints in Grid")
     ax.set_xlabel("X Coordinate")
     ax.set_ylabel("Y Coordinate")
     ax.yaxis.set(major_locator = ticker.MultipleLocator(5), minor_locator = ticker.MultipleLocator(1))
