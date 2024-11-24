@@ -423,7 +423,7 @@ def update_heatmap():
     heatmap = HM.HeatMap(nodes=heatmap_nodes, power_weights=power_weights)
     heatmap.generate_heatmap()
     intensity_array = heatmap.get_intensity_array()
-    print(intensity_array)
+    #print(intensity_array)
     max_value = []
     for i in intensity_array:
         max_value.append(max(i))
