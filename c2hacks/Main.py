@@ -249,6 +249,7 @@ def animate_line():
 
 def clear():
     global nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel, power, power_node
+    PF.clean()
     for i in nodes:
         destroy(i)
     for i in pipes:
@@ -365,7 +366,8 @@ def reset_animation_flag():
     is_animating = False
 
 def analyze_nodes():
-    global start, paths, pipes
+    global start, paths
+    PF.clean()
     obstacle_coord = []
     for i in obstacles:
         obstacle_coord.append(((i.position.x * 2 + 10), (i.position.y * 2) + 10))
