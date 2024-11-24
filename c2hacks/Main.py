@@ -2,6 +2,7 @@ from ursina import *
 import Path_Finding as PF
 import Heat_Map as HM
 import Pipe_Animate as PA
+import time
 
 # Initialize the Ursina app
 app = Ursina(development_mode=True)
@@ -379,15 +380,18 @@ def draw_heatmap():
         normalized_intensity_array.append(new_i)
 
     grid_size = len(normalized_intensity_array)
-    for y, row in enumerate(normalized_intensity_array):
-        for x, value in enumerate(row):
+
+    for y, row in enumerate(normalized_intensity_array, 0):
+        for x, value in enumerate(row, 0):
             color_value = intensity_to_color(value)
+            #print((xy - 20)/4)
             Entity(
                 model="cube",
                 color=color_value,
-                position= Vec3((x-20)/4, (y-20)/4, -value/100),  # Adjust position for grid layout
+                position= ((x - 20) / 4, (y  - 20) / 4, -value/100 + 5),  # Adjust position for grid layout
                 scale=(1/4, 1/4, 1)
             )
+
 
 def enable_wp():
     wp.enabled = True
