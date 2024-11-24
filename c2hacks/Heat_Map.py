@@ -3,19 +3,11 @@ import numpy as np
 import math
 
 class HeatMap:
-    def __init__(self, nodes):
+    def __init__(self, nodes, power_weights):
         self.nodes = nodes
+        self.power_weights = power_weights
 
     def generate_heatmap(self):
-        power_weights = {
-            "low": 0.1,
-            "medium": 0.2,
-            "high": 0.3,
-            "commercial": 0.4,
-            "industrial": 0.5,
-            "park": 0,
-            "power": 0
-        }
 
         building_colors = {
             "low" : "blue",
@@ -31,7 +23,7 @@ class HeatMap:
         x = [node.position.x for node in self.nodes]
         y = [node.position.y for node in self.nodes]
         types = [node.name.split()[0].lower() for node in self.nodes]
-        weights = [power_weights.get(t, 0) for t in types]
+        weights = [self.power_weights.get(t, 0) for t in types]
 
         if not x or not y:  # Skip if no nodes exist
             print("No buildings to generate heatmap!")

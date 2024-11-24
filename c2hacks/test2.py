@@ -26,6 +26,22 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 
 type = "low"
 
+low_value = 5.0
+medium_value = 5.0
+high_value = 5.0
+industrial_value = 5.0
+commercial_value = 5.0
+
+power_weights = {
+            "low": low_value,
+            "medium": medium_value,
+            "high": high_value,
+            "commercial": industrial_value,
+            "industrial": commercial_value,
+            "park": 0,
+            "power": 0
+        }
+
 pivot = Entity()
 pivot_rotate = Entity()
 camera.orthographic = True
@@ -58,17 +74,48 @@ def snap_to_grid(position, grid_size):
         round(position.z / grid_size) * grid_size
     )
 
+def update_params():
+    global low_value, medium_value, high_value, commercial_value, industrial_value, power_weights
+    low_value = round(low_density_slider.value, 4)
+    medium_value = round(medium_density_slider.value, 4)
+    high_value = round(high_density_slider.value, 4)
+    commercial_value = round(commercial_slider.value, 4)
+    industrial_value = round(industrial_slider.value, 4)
+    power_weights = {
+        "low": low_value,
+        "medium": medium_value,
+        "high": high_value,
+        "commercial": industrial_value,
+        "industrial": commercial_value,
+        "park": 0,
+        "power": 0
+    }
+
 # Function to show a popup with the building's name
 def show_popup(cube):
-    global popup_text
+    global popup_text, low_value, medium_value, high_value, commercial_value, industrial_value
 
     # If a popup already exists, destroy it
     if popup_text:
         destroy(popup_text)
 
+    if cube.name == "Low Density Building":
+        data = low_value
+    elif cube.name == "Medium Density Building":
+        data = medium_value
+    elif cube.name == "High Density Building":
+        data = high_value
+    elif cube.name == "Commercial Building":
+        data = commercial_value
+    elif cube.name == "Industrial Building":
+        data = industrial_value
+    elif cube.name == "Park":
+        data = 0
+    elif cube.name == "Power Generation":
+        data = 0
     # Create the popup
     popup_text = Text(
-        text=f"Building: {cube.name}",
+        text=f"Building: {cube.name} \n Power consumption: {data}",
         position=(mouse.position.x + 0.1, mouse.position.y + 0.1),  # Adjust the position of the popup
         origin=(0, 0),
         scale=1,
@@ -113,7 +160,7 @@ def add_cube(position):
     elif type == "park":
         size = (0.5, 0.5, 0.5)
         current_color = color.hex("629460")
-        name = "Park Building"
+        name = "Park"
     elif type == "power":
         size = (0.5, 0.5, 1)
         current_color = color.magenta
@@ -123,7 +170,7 @@ def add_cube(position):
         Look = 'folder/house.obj'
     elif name == "Medium Density Building":
         Look = 'folder/medium.obj'
-    elif name == "Park Building":
+    elif name == "Park":
         Look = 'folder/park.obj'
     elif name == "Industrial Building":
         Look = 'folder/industrial.obj'
@@ -137,7 +184,7 @@ def add_cube(position):
         Look = 'cube'
     if name == "Industrial Building":
         snapped_position = snapped_position - (0, 0, -0.25)
-    if name == "Park Building":
+    if name == "Park":
         snapped_position = snapped_position - (0, 0, -0.1)
     cube = Entity(
 
@@ -172,6 +219,8 @@ def add_entity():
     mouse_x, mouse_y, _ = mouse.position  # Mouse position in screen space (-1 to 1)
     # Create a new entity at the x and y position with z set to 0
     add_cube(position = mouse.position * camera.fov)
+
+
 
 # Input handling
 def input(key):
@@ -275,7 +324,7 @@ def analyze_nodes():
     simulator.plot()
 
 def draw_heatmap():
-    heatmap = HM.HeatMap(nodes=heatmap_nodes)
+    heatmap = HM.HeatMap(nodes=heatmap_nodes,power_weights=power_weights)
     heatmap.generate_heatmap()
 
 def enable_wp():
@@ -386,20 +435,16 @@ bar = Entity(
 )
 
 # Create individual elements first
-park_slider = ThinSlider()
-low_density_slider = ThinSlider()
-medium_density_slider = ThinSlider()
-high_density_slider = ThinSlider()
-commercial_slider = ThinSlider()
-industrial_slider = ThinSlider()
-power_generation_slider = ThinSlider()
+low_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+medium_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+high_density_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+commercial_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
+industrial_slider = ThinSlider(0, 10, default=5, step=0.25, dynamic= False, on_value_changed = update_params)
 
 # Now define the window panel
 wp = WindowPanel(
     title='Set Parameters',
     content=(
-        Text("Park"),
-        park_slider,
         Text("Low Density"),
         low_density_slider,
         Text("Medium Density"),
@@ -409,9 +454,7 @@ wp = WindowPanel(
         Text("Commercial"),
         commercial_slider,
         Text("Industrial"),
-        industrial_slider,
-        Text("Power Generation"),
-        power_generation_slider,
+        industrial_slider
     ),
     popup=True
 )
