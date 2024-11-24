@@ -66,6 +66,7 @@ previous_mouse_position = Vec2(0, 0)  # Tracks the previous mouse position
 # Variables for the sidebar button
 orthographic_locked = True
 is_animating = False
+is_simulating = False
 finished_simulating = False
 
 # Grid snapping function
@@ -244,8 +245,15 @@ def add_entity():
     add_cube(position = mouse.position * camera.fov)
 
 def animate_line():
-    global paths, draw_path
+    global paths, draw_path, pipes
+
+    for i in pipes:
+        destroy(i)
+    for i in draw_path:
+        destroy(i)
+
     draw_path = []
+
     for i in paths:
         for j in i:
             x, y = j
@@ -547,9 +555,22 @@ def display_graphs():
 
 
 def simulate_queue():
+    global is_simulating, heat_pixel
+
     if not heat_pixel:
         print("No heatmap")
+        draw_heatmap()
+        if nodes and power_node:
+            simulate_queue()
+
+    if is_simulating:
         return
+
+    is_simulating = True
+
+    toggle_orthographic()
+    analyze_nodes()
+
 
     for i in range(24):
         if i > 8 and i < 17:
@@ -557,6 +578,7 @@ def simulate_queue():
         else:
             invoke(lambda: simulate(0, i + 1), delay=i/4)
     simulate_button.text = f"Simulate!"
+    print("donee!!")
 
 def enable_wp():
     wp.enabled = True
