@@ -90,11 +90,11 @@ def add_cube(position):
         current_color = color.hex("9ee2f0")
         name = "Low Density Building"
     elif type == "medium":
-        size = (0.5, 0.5, 1)
+        size = (0.5, 0.5, 0.5)
         current_color = color.hex("fbb1b1")
         name = "Medium Density Building"
     elif type == "high":
-        size = (0.5, 0.5, 1.5)
+        size = (0.5, 0.5, 1.0)
         current_color = color.hex("fde58b")
         name = "High Density Building"
     elif type == "commercial":
@@ -102,7 +102,7 @@ def add_cube(position):
         current_color = color.hex("d08d2e")
         name = "Commercial Building"
     elif type == "industrial":
-        size = (0.5, 0.5, 1)
+        size = (0.5, 0.5, 0.5)
         current_color = color.hex("2a2b2a")
         name = "Industrial Building"
     elif type == "park":
@@ -110,16 +110,33 @@ def add_cube(position):
         current_color = color.hex("629460")
         name = "Park Building"
     elif type == "power":
-        size = (0.5, 0.5, 0.5)
+        size = (1, 1, 2)
         current_color = color.magenta
         name = "Power Generation"
 
+    if name == "Low Density Building":
+        Look = 'folder/house.obj'
+    elif name == "Medium Density Building":
+        Look = 'folder/medium.obj'
+    elif name == "Park Building":
+        Look = 'folder/park.obj'
+    elif name == "Industrial Building":
+        Look = 'folder/industrial.obj'
+    elif name == "Commercial Building":
+        Look = 'folder/market.obj'
+    elif name == "High Density Building":
+        Look = 'folder/medium.obj'
+    elif name == "Power Generation":
+        Look = 'cube'
+    else:
+        Look = 'cube'
+
     cube = Entity(
-        model = 'cube',
+        model = Look, double_sided = True,
         color = current_color,
         position = snapped_position - (0, 0, size[2] / 2),
         collider = 'box',  # Add a box collider for detecting mouse hover
-        scale = size,
+        scale = (size[0]/2, size[1]/2, size[2]/2),
         name = name,
         cast_shadows = True
     )
