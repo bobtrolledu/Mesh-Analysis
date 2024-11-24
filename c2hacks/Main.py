@@ -77,11 +77,11 @@ def snap_to_grid(position, grid_size):
 
 def update_params():
     global low_value, medium_value, high_value, commercial_value, industrial_value, power_weights
-    low_value = round(low_density_slider.value, 4)
-    medium_value = round(medium_density_slider.value, 4)
-    high_value = round(high_density_slider.value, 4)
-    commercial_value = round(commercial_slider.value, 4)
-    industrial_value = round(industrial_slider.value, 4)
+    low_value = round(low_density_slider.value, 4) * 2
+    medium_value = round(medium_density_slider.value, 4) * 500
+    high_value = round(high_density_slider.value, 4) * 1000
+    commercial_value = round(commercial_slider.value, 4) * 3
+    industrial_value = round(industrial_slider.value, 4) * 1200
     power_weights = {
         "low": low_value,
         "medium": medium_value,
@@ -206,7 +206,7 @@ def add_cube(position):
         color = current_color,
         position = snapped_position - (0, 0, size[2] / 2),
         collider = 'box',  # Add a box collider for detecting mouse hover
-        scale = (size[0]/2, size[1]/2, size[2]/2),
+        scale = (size[0]/2.3, size[1]/2.3, size[2]/2.3),
         name = name,
         cast_shadows = True
     )
@@ -367,6 +367,9 @@ def reset_animation_flag():
 
 def analyze_nodes():
     global start, paths
+    if not power_node:
+        return
+
     PF.clean()
     obstacle_coord = []
     for i in obstacles:
@@ -474,6 +477,11 @@ def simulate(bias, hour):
     update_heatmap(hour)
 
 def simulate_queue():
+
+    if not heat_pixel:
+        print("No heatmap")
+        return
+
     for i in range(24):
         if i > 8 and i < 17:
             invoke(lambda: simulate(1, i + 1), delay=i/4)
@@ -677,7 +685,7 @@ wp = WindowPanel(
         low_density_slider,
         Text("Apartments per Medium Density Zone"),
         medium_density_slider,
-        Text("Apartments per High Density Zone"),
+        Text("High rises per High Density Zone"),
         high_density_slider,
         Text("Shops per Commercial Zone"),
         commercial_slider,
