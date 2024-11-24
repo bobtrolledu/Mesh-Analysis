@@ -3,6 +3,8 @@ import Heat_Map as HM
 import Pipe_Animate as PA
 import heatpixel as HP
 import A_Star_Path_Finding as PF
+import display_plot as DP
+import matplotlib.pyplot as plt
 
 # Initialize the Ursina app
 app = Ursina(development_mode=True)
@@ -15,7 +17,7 @@ window.borderless = False
 window.show_ursina_splash = True
 scene.background_color = color.white
 
-nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel = [],[],[],[],[],[],[],[]
+nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel,total_energy_use = [],[],[],[],[],[],[],[],[]
 
 power_node = None
 popup_text = None
@@ -489,8 +491,20 @@ def simulate(bias, hour):
             commercial_value -= 10
         if industrial_value > 50:
             industrial_value -= 80
+
+    total_energy_use.append(calculate_energy_usage())
     update_power_weights()
     update_heatmap(hour)
+
+def display_graphs():
+    x =[]
+    for i in range(len(total_energy_use)):
+        x.append(i + 1)
+
+    print(x)
+    plt.plot(x,total_energy_use)
+    plt.show()
+    #textures =  DP.display()
 
 def simulate_queue():
 
@@ -511,6 +525,7 @@ def enable_wp():
 def enable_analysis_interface():
     analysis_screen.visible = True
     analysis_screen.collider = 'box'
+    display_graphs()
 
 def enable_sandbox_interface():
     analysis_screen.visible = False

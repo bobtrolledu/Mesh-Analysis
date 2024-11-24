@@ -75,7 +75,6 @@ class HeatMap:
         plt.xlabel("X")
         plt.ylabel("Y")
         plt.gca().set_aspect('equal', adjustable='box')  # Maintain aspect ratio
-        plt.show()
 
     def get_intensity_array(self):
         return self.intensity_array
