@@ -6,6 +6,9 @@ import heatpixel as HP
 
 # Initialize the Ursina app
 app = Ursina(development_mode=True)
+# Set window size (width, height) in pixels
+window.size = (16*100, 9*100)  # Adjust the window size as needed
+window.title = "Energy Emulator"  # Set the window title
 scene.background_color = color.white
 
 nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel = [],[],[],[],[],[],[],[]
@@ -108,22 +111,22 @@ def show_popup(cube):
         destroy(popup_text)
 
     if cube.name == "Low Density Building":
-        data = low_value
+        popup_data = low_value
     elif cube.name == "Medium Density Building":
-        data = medium_value
+        popup_data = medium_value
     elif cube.name == "High Density Building":
-        data = high_value
+        popup_data = high_value
     elif cube.name == "Commercial Building":
-        data = commercial_value
+        popup_data = commercial_value
     elif cube.name == "Industrial Building":
-        data = industrial_value
+        popup_data = industrial_value
     elif cube.name == "Park":
-        data = 0
+        popup_data = 0
     elif cube.name == "Power Generation":
-        data = 0
+        popup_data = 0
     # Create the popup
     popup_text = Text(
-        text=f"Building: {cube.name} \n Power consumption: {data}",
+        text=f"Building: {cube.name} \n Power consumption: {popup_data}",
         position=(mouse.position.x + 0.1, mouse.position.y + 0.1),  # Adjust the position of the popup
         origin=(0, 0),
         scale=1,
