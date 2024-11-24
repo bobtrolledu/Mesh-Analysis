@@ -114,7 +114,7 @@ def add_cube(position):
         current_color = color.hex("629460")
         name = "Park Building"
     elif type == "power":
-        size = (1, 1, 2)
+        size = (0.5, 0.5, 1)
         current_color = color.magenta
         name = "Power Generation"
 
@@ -131,11 +131,15 @@ def add_cube(position):
     elif name == "High Density Building":
         Look = 'folder/medium.obj'
     elif name == "Power Generation":
-        Look = 'cube'
+        Look = 'folder/market.obj'
     else:
         Look = 'cube'
-
+    if name == "Industrial Building":
+        snapped_position = snapped_position - (0, 0, -0.25)
+    if name == "Park Building":
+        snapped_position = snapped_position - (0, 0, -0.1)
     cube = Entity(
+
         model = Look, double_sided = True,
         color = current_color,
         position = snapped_position - (0, 0, size[2] / 2),
