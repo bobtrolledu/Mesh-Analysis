@@ -44,7 +44,6 @@ def calculate_h_value(row, col, dest):
 
 # Trace the path from source to destination
 def trace_path(cell_details, dest):
-    print("The Path is ")
     path = []
     row = dest[0]
     col = dest[1]
@@ -61,11 +60,6 @@ def trace_path(cell_details, dest):
     path.append((row, col))
     # Reverse the path to get the path from source to destination
     path.reverse()
-
-    # Print the path
-    for i in path:
-        print("->", i, end=" ")
-    print()
     total_paths.append(path)
 
 # Implement the A* search algorithm
@@ -130,7 +124,6 @@ def a_star_search(grid, src, dest):
                     # Set the parent of the destination cell
                     cell_details[new_i][new_j].parent_i = i
                     cell_details[new_i][new_j].parent_j = j
-                    print("The destination cell is found")
                     # Trace and print the path from source to destination
                     trace_path(cell_details, dest)
                     found_dest = True
@@ -164,7 +157,6 @@ def set_starting(obstacles,start_coords,endpoints):
                 grid[i].append(1)
             elif (i,j) in obstacles:
                 grid[i].append(0)
-                print("oops")
     src = start_coords
     for i in endpoints:
         dest.append((i.position.x * 2 + 10, i.position.y * 2 + 10))
@@ -172,6 +164,11 @@ def set_starting(obstacles,start_coords,endpoints):
     for i in dest:
         a_star_search(grid, src, i)
     return total_paths
+
+def clean():
+    global  src,dest,grid,total_paths
+    src, dest, grid, total_paths = [],[],[],[]
+
 
 def plot(obstacles, start_coords):
     """Visualize the results using matplotlib."""

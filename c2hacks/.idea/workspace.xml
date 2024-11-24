@@ -6,9 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="f337e903-f18d-4c0c-8d95-87f87fcb27e7" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/LoadingTest.py" beforeDir="false" afterPath="$PROJECT_DIR$/LoadingTest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/A_Star_Path_Finding.py" beforeDir="false" afterPath="$PROJECT_DIR$/A_Star_Path_Finding.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Path_Finding.py" beforeDir="false" afterPath="$PROJECT_DIR$/Path_Finding.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,6 +41,9 @@
     &quot;accountId&quot;: &quot;57ed19a6-b732-44ea-a202-c4fb506ee3ba&quot;
   }
 }</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="QODANA_PROBLEMS_VIEW_TAB" />
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 7
 }</component>
@@ -52,6 +54,7 @@
   </component>
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
+    "Python.A_Star_Path_Finding.executor": "Run",
     "Python.LoadingTest.executor": "Run",
     "Python.Main.executor": "Run",
     "Python.Path_Finding_Test.executor": "Run",
@@ -208,7 +211,7 @@
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/c2hacks$matplotlibtools.coverage" NAME="matplotlibtools Coverage Results" MODIFIED="1732462228656" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$APPLICATION_HOME_DIR$/plugins/python-ce/helpers/pydev/pydev_ipython" />
     <SUITE FILE_PATH="coverage/c2hacks$test.coverage" NAME="test Coverage Results" MODIFIED="1732367324924" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/c2hacks$Main.coverage" NAME="Main Coverage Results" MODIFIED="1732476837753" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/c2hacks$Main.coverage" NAME="Main Coverage Results" MODIFIED="1732478180332" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/c2hacks$LoadingTest.coverage" NAME="LoadingTest Coverage Results" MODIFIED="1732475014788" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/c2hacks$Prototype_v1.coverage" NAME="Prototype_v1 Coverage Results" MODIFIED="1732396540287" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/c2hacks$main.coverage" NAME="main Coverage Results" MODIFIED="1732455229952" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/.venv/Lib/site-packages/ursina" />
@@ -220,5 +223,6 @@
     <SUITE FILE_PATH="coverage/c2hacks$Path_Finding.coverage" NAME="Path_Finding Coverage Results" MODIFIED="1732414492254" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/c2hacks$Bordered_Entity.coverage" NAME="Bordered_Entity Coverage Results" MODIFIED="1732411112568" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/c2hacks$Pipe_Animate.coverage" NAME="Pipe_Animate Coverage Results" MODIFIED="1732424413295" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/c2hacks$A_Star_Path_Finding.coverage" NAME="A_Star_Path_Finding Coverage Results" MODIFIED="1732477632139" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
