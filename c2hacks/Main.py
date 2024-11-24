@@ -104,7 +104,6 @@ def update_power_weights():
         "power": 0
     }
 
-
 # Function to show a popup with the building's name
 def show_popup(cube):
     global popup_text, low_value, medium_value, high_value, commercial_value, industrial_value
@@ -332,7 +331,6 @@ def update():
 
         if not mouse.hovered_entity or mouse.hovered_entity is grid:
             destroy_popup()
-
 
 # Function to toggle orthographic view
 def toggle_orthographic():
