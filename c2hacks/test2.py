@@ -1,12 +1,16 @@
 from ursina import *
 import Path_Finding as PF
 import Heat_Map as HM
+import Pipe_Animate as PA
 
 # Initialize the Ursina app
 app = Ursina(development_mode=True)
 
-
 nodes = []
+paths = []
+pipes = []
+initial_path = []
+draw_path = []
 obstacles = []
 power_node = None
 heatmap_nodes = []
@@ -173,6 +177,18 @@ def add_entity():
     # Create a new entity at the x and y position with z set to 0
     add_cube(position = mouse.position * camera.fov)
 
+def animate_line():
+    global paths, draw_path, initial_path, pipes
+    for i in paths:
+        for j in i:
+            x, y = j
+            draw_path.append(((x - 10) / 2, (y - 10) / 2, 0))
+
+        new_pipe = PA.Pipe_Animate([draw_path[0], draw_path[1]], draw_path)
+        new_pipe.animate_pipe()
+        pipes.append(new_pipe.get_pipe())
+        draw_path = []
+
 # Input handling
 def input(key):
     global is_dragging, previous_mouse_position, power_node
@@ -269,10 +285,14 @@ def reset_animation_flag():
     is_animating = False
 
 def analyze_nodes():
-    global start
+    global start, paths, pipes
     simulator = PF.SlimeMoldSimulator(grid_size=20, endpoints=nodes, obstacle_chance=0, start_coords=start, obstacles=obstacles)
     simulator.run()
     simulator.plot()
+    paths = simulator.get_path()
+    for i in pipes:
+        destroy(i)
+    animate_line()
 
 def draw_heatmap():
     heatmap = HM.HeatMap(nodes=heatmap_nodes)

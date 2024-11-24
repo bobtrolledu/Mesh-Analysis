@@ -127,3 +127,6 @@ class SlimeMoldSimulator:
         plt.ylim(-0.5, 20.5)
         plt.grid(True)
         plt.show()
+
+    def get_path(self):
+        return self.paths
