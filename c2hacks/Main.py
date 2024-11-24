@@ -759,4 +759,5 @@ wp.layout()
 grid = Entity(model=Grid(20, 20), scale=(10, 10, 1), color=color.light_gray, collider = 'box', position=(grid_shift_x, grid_shift_y, 0), receive_shadows = True)
 
 # Run the app
+update_params()
 app.run()
