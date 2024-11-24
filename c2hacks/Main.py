@@ -5,13 +5,14 @@ import heatpixel as HP
 import A_Star_Path_Finding as PF
 
 # Initialize the Ursina app
-app = Ursina(development_mode=True)
+app = Ursina(development_mode=False)
 # Set window size (width, height) in pixels
 window.size = (16*100, 9*100)  # Adjust the window size as needed
 window.title = "Energy Emulator"  # Set the window title
 window.draggable = True
 window.resizable = True
 window.borderless = False
+window.show_ursina_splash = True
 scene.background_color = color.white
 
 nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel = [],[],[],[],[],[],[],[]
@@ -65,7 +66,6 @@ previous_mouse_position = Vec2(0, 0)  # Tracks the previous mouse position
 # Variables for the sidebar button
 orthographic_locked = True
 is_animating = False
-zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
@@ -129,7 +129,7 @@ def show_popup(cube):
         popup_data = 0
     # Create the popup
     popup_text = Text(
-        text=f"Building: {cube.name} \n Power consumption: {popup_data}",
+        text=f"Building: {cube.name} \n Power consumption Intensity: {popup_data}",
         position=(mouse.position.x + 0.1, mouse.position.y + 0.1),  # Adjust the position of the popup
         origin=(0, 0),
         scale=1,
@@ -299,6 +299,16 @@ def input(key):
     elif key == 'right mouse up':  # Stop dragging on right mouse up
         is_dragging = False
 
+    elif key == 'scroll up':
+        if not orthographic_locked:
+            camera.fov = max(10, min(80, camera.fov))
+            camera.fov -= 500 * time.dt
+    elif key == 'scroll down':
+        if not orthographic_locked:
+            camera.fov = max(10, min(80, camera.fov))
+            camera.fov += 500 * time.dt
+
+
 def orthographic_out_spin_animation():
     pivot.animate('rotation_x', pivot.rotation_x - 50, duration=2, curve=curve.in_out_expo)
 
@@ -329,6 +339,7 @@ def update():
         if not mouse.hovered_entity or mouse.hovered_entity is grid:
             destroy_popup()
 
+
 # Function to toggle orthographic view
 def toggle_orthographic():
     global orthographic_locked, is_animating
@@ -341,14 +352,14 @@ def toggle_orthographic():
     if orthographic_locked:
         orthographic_locked = not orthographic_locked  # Toggle the state
         camera.orthographic = orthographic_locked
-        orthogonal.text = f"3D View"
+        orthogonal.text = f"Go 2D"
         camera.fov = 60
         orthographic_out_spin_animation()
         orthographic_locked = False
     else:
         orthographic_locked = not orthographic_locked  # Toggle the state
         camera.orthographic = orthographic_locked
-        orthogonal.text = f"2D View"
+        orthogonal.text = f"Go 3D"
         pivot_rotate.animate('rotation_z', pivot_rotate.rotation_z - pivot_rotate.rotation_z, duration=2, curve=curve.in_out_expo)
         orthographic_in_spin_animation()
         camera.fov = 15
@@ -483,13 +494,13 @@ def enable_wp():
 button_group = []
 
 # Define the buttons and add them to the group
-park = Button(model="quad", text = "Green Space", color=color.gray, position=(-0.74, 0.30), scale=(0.2, 0.08))
-low = Button(model="quad", text="Low Density Housing", color=color.gray, position=(-0.74, 0.21), scale=(0.2, 0.08), text_size=0.75)
-medium = Button(model="quad", text="Medium Density Housing", color=color.gray, position=(-0.74, 0.12), scale=(0.2, 0.08), text_size=0.65)
-high = Button(model="quad", text="High Density Housing", color=color.gray, position=(-0.74, 0.03), scale=(0.2, 0.08), text_size=0.75)
-commercial = Button(model="quad", text = "Commercial District", color=color.gray, position=(-0.74, -0.06), scale=(0.2, 0.08), text_size=0.75)
-industrial = Button(model="quad", text = "Industrial District", color=color.gray, position=(-0.74, -0.15), scale=(0.2, 0.08), text_size=0.95)
-power = Button(model="quad", text = "Power Plant", color=color.gray, position=(-0.74, -0.24), scale=(0.2, 0.08))
+park = Button(model="quad", text = "Green Space", color=color.gray, position=(-0.74, 0.30), scale=(0.2, 0.08), text_size=0.75)
+low = Button(model="quad", text="Low Density", color=color.gray, position=(-0.74, 0.21), scale=(0.2, 0.08), text_size=0.75)
+medium = Button(model="quad", text="Medium Density", color=color.gray, position=(-0.74, 0.12), scale=(0.2, 0.08), text_size=0.75)
+high = Button(model="quad", text="High Density", color=color.gray, position=(-0.74, 0.03), scale=(0.2, 0.08), text_size=0.75)
+commercial = Button(model="quad", text = "Commercial", color=color.gray, position=(-0.74, -0.06), scale=(0.2, 0.08), text_size=0.75)
+industrial = Button(model="quad", text = "Industrial", color=color.gray, position=(-0.74, -0.15), scale=(0.2, 0.08), text_size=0.75)
+power = Button(model="quad", text = "Power Plant", color=color.gray, position=(-0.74, -0.24), scale=(0.2, 0.08), text_size=0.75)
 
 # Add buttons to the button group
 button_group.append(park)
@@ -539,28 +550,28 @@ def on_button_click(button):
 
 orthogonal = Button(
     model='quad',
-    text="2D View",
+    text="Go 3D",
     color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.745, 0.07),
+    position=(0.745, 0.20),
     on_click=toggle_orthographic
 )
 
 simulate_button = Button(
     model='quad',
-    text="Simulate!",
+    text="Simulate Day",
     color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.745, 0.20),
+    position=(0.745, -0.19),
     on_click=simulate_queue
 )
 
 analyze_button = Button(
     model='quad',
-    text= "Build Grid",
+    text= "Generate Lines",
     color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.745, -0.06),
+    position=(0.745, 0.07),
     on_click=analyze_nodes
 )
 
@@ -569,7 +580,7 @@ heatmap_button = Button(
     text="Show Heatmap",
     color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.745, -0.19),
+    position=(0.745, -0.06),
     on_click=draw_heatmap
 )
 
