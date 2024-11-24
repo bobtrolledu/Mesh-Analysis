@@ -341,14 +341,14 @@ def toggle_orthographic():
     if orthographic_locked:
         orthographic_locked = not orthographic_locked  # Toggle the state
         camera.orthographic = orthographic_locked
-        orthogonal.text = f"3D View"
+        orthogonal.text = f"Go 2D"
         camera.fov = 60
         orthographic_out_spin_animation()
         orthographic_locked = False
     else:
         orthographic_locked = not orthographic_locked  # Toggle the state
         camera.orthographic = orthographic_locked
-        orthogonal.text = f"2D View"
+        orthogonal.text = f"Go 3D"
         pivot_rotate.animate('rotation_z', pivot_rotate.rotation_z - pivot_rotate.rotation_z, duration=2, curve=curve.in_out_expo)
         orthographic_in_spin_animation()
         camera.fov = 15
@@ -487,13 +487,13 @@ def enable_wp():
 button_group = []
 
 # Define the buttons and add them to the group
-park = Button(model="quad", text = "Green Space", color=color.gray, position=(-0.74, 0.30), scale=(0.2, 0.08))
-low = Button(model="quad", text="Low Density Housing", color=color.gray, position=(-0.74, 0.21), scale=(0.2, 0.08), text_size=0.75)
-medium = Button(model="quad", text="Medium Density Housing", color=color.gray, position=(-0.74, 0.12), scale=(0.2, 0.08), text_size=0.65)
-high = Button(model="quad", text="High Density Housing", color=color.gray, position=(-0.74, 0.03), scale=(0.2, 0.08), text_size=0.75)
-commercial = Button(model="quad", text = "Commercial District", color=color.gray, position=(-0.74, -0.06), scale=(0.2, 0.08), text_size=0.75)
-industrial = Button(model="quad", text = "Industrial District", color=color.gray, position=(-0.74, -0.15), scale=(0.2, 0.08), text_size=0.95)
-power = Button(model="quad", text = "Power Plant", color=color.gray, position=(-0.74, -0.24), scale=(0.2, 0.08))
+park = Button(model="quad", text = "Green Space", color=color.gray, position=(-0.74, 0.30), scale=(0.2, 0.08), text_size=0.75)
+low = Button(model="quad", text="Low Density", color=color.gray, position=(-0.74, 0.21), scale=(0.2, 0.08), text_size=0.75)
+medium = Button(model="quad", text="Medium Density", color=color.gray, position=(-0.74, 0.12), scale=(0.2, 0.08), text_size=0.75)
+high = Button(model="quad", text="High Density", color=color.gray, position=(-0.74, 0.03), scale=(0.2, 0.08), text_size=0.75)
+commercial = Button(model="quad", text = "Commercial", color=color.gray, position=(-0.74, -0.06), scale=(0.2, 0.08), text_size=0.75)
+industrial = Button(model="quad", text = "Industrial", color=color.gray, position=(-0.74, -0.15), scale=(0.2, 0.08), text_size=0.75)
+power = Button(model="quad", text = "Power Plant", color=color.gray, position=(-0.74, -0.24), scale=(0.2, 0.08), text_size=0.75)
 
 # Add buttons to the button group
 button_group.append(park)
@@ -543,28 +543,28 @@ def on_button_click(button):
 
 orthogonal = Button(
     model='quad',
-    text="2D View",
+    text="Go 3D",
     color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.745, 0.07),
+    position=(0.745, 0.20),
     on_click=toggle_orthographic
 )
 
 simulate_button = Button(
     model='quad',
-    text="Simulate!",
+    text="Simulate Day",
     color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.745, 0.20),
+    position=(0.745, -0.19),
     on_click=simulate_queue
 )
 
 analyze_button = Button(
     model='quad',
-    text= "Build Grid",
+    text= "Generate Lines",
     color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.745, -0.06),
+    position=(0.745, 0.07),
     on_click=analyze_nodes
 )
 
@@ -573,7 +573,7 @@ heatmap_button = Button(
     text="Show Heatmap",
     color=color.gray,
     scale=(0.25, 0.1),
-    position=(0.745, -0.19),
+    position=(0.745, -0.06),
     on_click=draw_heatmap
 )
 
