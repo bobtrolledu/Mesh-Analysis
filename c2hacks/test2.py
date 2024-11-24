@@ -46,6 +46,11 @@ zoom_factor = 1  # Used for scaling the FOV (in orthographic mode)
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
+    print(Vec3(
+        round(position.x / grid_size) * grid_size,
+        round(position.y / grid_size) * grid_size,
+        round(position.z / grid_size) * grid_size
+    ))
     return Vec3(
         round(position.x / grid_size) * grid_size,
         round(position.y / grid_size) * grid_size,
@@ -129,7 +134,7 @@ def add_cube(position):
         if power_node is None:
             global start
             power_node = cube
-            start = (cube.position.x + (10 - grid_shift_x), cube.position.y + (10 - grid_shift_y))
+            start = (cube.position.x * 2 + 10, cube.position.y * 2 + 10)
         else:
             destroy(cube)
             return
