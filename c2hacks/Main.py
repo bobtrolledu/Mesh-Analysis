@@ -5,9 +5,11 @@ import heatpixel as HP
 import A_Star_Path_Finding as PF
 import display_plot as DP
 import matplotlib.pyplot as plt
+from PIL import Image
+from io import BytesIO
 
 # Initialize the Ursina app
-app = Ursina(development_mode=True)
+app = Ursina(development_mode=False)
 # Set window size (width, height) in pixels
 window.size = (16*100, 9*100)  # Adjust the window size as needed
 window.title = "Energy Emulator"  # Set the window title
@@ -17,7 +19,7 @@ window.borderless = False
 window.show_ursina_splash = True
 scene.background_color = color.white
 
-nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel,total_energy_use = [],[],[],[],[],[],[],[],[]
+nodes, paths, pipes, initial_path, draw_path, obstacles, heatmap_nodes, heat_pixel,total_energy_use, plot_entity_list = [],[],[],[],[],[],[],[],[],[]
 
 power_node = None
 popup_text = None
@@ -35,11 +37,7 @@ light1 = PointLight(position=Vec3(-6, -6, 10))
 
 type = "low"
 
-low_value = 80.0 * 2
-medium_value = 10.0 * 500
-high_value = 3 * 1000
-commercial_value = 5 * 30
-industrial_value = 1 * 1200
+low_value, medium_value, high_value, commercial_value, industrial_value = 0, 0, 0, 0, 0
 
 power_weights = {
     "low": low_value,
@@ -68,13 +66,10 @@ previous_mouse_position = Vec2(0, 0)  # Tracks the previous mouse position
 # Variables for the sidebar button
 orthographic_locked = True
 is_animating = False
-<<<<<<< Updated upstream
-=======
 is_simulating = False
 finished_simulating = False
 simulation_length = 7
 current_simulation_invokes = simulation_length * 24
->>>>>>> Stashed changes
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
@@ -134,15 +129,24 @@ def show_popup(cube):
     elif cube.name == "Park":
         popup_data = 0
     elif cube.name == "Power Generation":
-        popup_data = 0
-    # Create the popup
+        popup_data = calculate_energy_usage()
+
+
+
+        # Create the popup
     popup_text = Text(
-        text=f"Building: {cube.name} \n Power consumption Intensity: {popup_data}",
+        text= if_power_text(cube, popup_data),
         position=(mouse.position.x + 0.1, mouse.position.y + 0.1),  # Adjust the position of the popup
         origin=(0, 0),
         scale=1,
         background=True
     )
+
+def if_power_text(cube, popup_data):
+    if cube.name == "Power Generation":
+        return f"{cube.name} \n Power Generation needed: {popup_data} kW/h"
+    else:
+        return f"{cube.name} \n Power consumption Intensity: {popup_data} kW/h"
 
 # Function to destroy the popup
 def destroy_popup():
@@ -243,8 +247,15 @@ def add_entity():
     add_cube(position = mouse.position * camera.fov)
 
 def animate_line():
-    global paths, draw_path
+    global paths, draw_path, pipes
+
+    for i in pipes:
+        destroy(i)
+    for i in draw_path:
+        destroy(i)
+
     draw_path = []
+
     for i in paths:
         for j in i:
             x, y = j
@@ -349,6 +360,8 @@ def toggle_orthographic():
         return
 
     is_animating = True
+
+    update_params()
 
     if orthographic_locked:
         orthographic_locked = not orthographic_locked  # Toggle the state
@@ -502,26 +515,11 @@ def simulate(bias, hour):
     total_energy_use.append(calculate_energy_usage())
     update_power_weights()
     update_heatmap(hour)
-<<<<<<< Updated upstream
-=======
     current_simulation_invokes -= 1
     #print(hour)
->>>>>>> Stashed changes
 
 def display_graphs():
-    x =[]
-    for i in range(len(total_energy_use)):
-        x.append(i + 1)
 
-<<<<<<< Updated upstream
-    print(total_energy_use)
-    print(x)
-    plt.plot(x,total_energy_use)
-    plt.show()
-    #textures =  DP.display()
-
-def simulate_queue():
-=======
     x = []
 
     for i in range(simulation_length):
@@ -562,21 +560,16 @@ def simulate_queue():
 
 def simulate_queue():
     global is_simulating, heat_pixel, current_simulation_invokes
->>>>>>> Stashed changes
 
     if not heat_pixel:
         print("No heatmap")
+        draw_heatmap()
+        if nodes and power_node:
+            simulate_queue()
+
+    if is_simulating:
         return
 
-<<<<<<< Updated upstream
-    for i in range(24):
-        if i > 8 and i < 17:
-            invoke(lambda: simulate(1, i + 1), delay=i/4)
-        else:
-            invoke(lambda: simulate(0, i + 1), delay=i/4)
-    simulate_button.text = f"Simulate!"
-
-=======
     is_simulating = True
 
     if orthographic_locked:
@@ -600,7 +593,6 @@ def simulate_queue():
 
     print("donee!!")
 
->>>>>>> Stashed changes
 def enable_wp():
     wp.enabled = True
 
@@ -609,9 +601,15 @@ def enable_analysis_interface():
     analysis_screen.collider = 'box'
     display_graphs()
 
+    for i in plot_entity_list:
+        i.visible = True
+
 def enable_sandbox_interface():
     analysis_screen.visible = False
     analysis_screen.collider = None
+
+    for i in plot_entity_list:
+        i.visible = False
 
 #UI
 # Create a group of buttons
@@ -794,7 +792,7 @@ logo = Entity(
 analysis_screen = Entity(
     parent=camera.ui,
     model='quad',
-    color=color.hex("d3d3d3"),
+    color=color.white,
     scale=(3, 3),
     position=(0, 0),
     z = -50,
@@ -803,11 +801,11 @@ analysis_screen = Entity(
 )
 
 # Create individual elements first
-low_density_slider = ThinSlider(1, 100, default=80, step=1, dynamic= False, on_value_changed = update_params)
-medium_density_slider = ThinSlider(1, 20, default=10, step=1, dynamic= False, on_value_changed = update_params)
-high_density_slider = ThinSlider(1, 15, default=3, step=1, dynamic= False, on_value_changed = update_params)
-commercial_slider = ThinSlider(1, 10, default=5, step=1, dynamic= False, on_value_changed = update_params)
-industrial_slider = ThinSlider(1, 3, default=1, step=1, dynamic= False, on_value_changed = update_params)
+low_density_slider = ThinSlider(1, 100, default=80, step=1, dynamic= True, on_value_changed = update_params)
+medium_density_slider = ThinSlider(1, 20, default=10, step=1, dynamic= True, on_value_changed = update_params)
+high_density_slider = ThinSlider(1, 15, default=3, step=1, dynamic= True, on_value_changed = update_params)
+commercial_slider = ThinSlider(1, 10, default=5, step=1, dynamic= True, on_value_changed = update_params)
+industrial_slider = ThinSlider(1, 3, default=1, step=1, dynamic= True, on_value_changed = update_params)
 
 # Now define the window panel
 wp = WindowPanel(
@@ -833,4 +831,5 @@ wp.layout()
 grid = Entity(model=Grid(20, 20), scale=(10, 10, 1), color=color.light_gray, collider = 'box', position=(grid_shift_x, grid_shift_y, 0), receive_shadows = True)
 
 # Run the app
+update_params()
 app.run()
