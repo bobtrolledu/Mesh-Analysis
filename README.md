@@ -3,5 +3,9 @@
 - heatmap yohanes, victor
 - pathfinding anson
 - 3d models ethan
-- bugs victor
+- lighting ethan, victor
+- bug hunting victor, ethan, yohanes, anson
 - plotting victor
+- animations anson, victor
+- interface victor
+
