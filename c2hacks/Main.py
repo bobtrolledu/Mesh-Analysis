@@ -569,7 +569,10 @@ def simulate_queue():
 
     is_simulating = True
 
-    toggle_orthographic()
+    if orthographic_locked:
+        toggle_orthographic()
+
+
     analyze_nodes()
 
 
