@@ -515,8 +515,9 @@ def simulate(bias, hour):
     total_energy_use.append(calculate_energy_usage())
     update_power_weights()
     update_heatmap(hour)
-    current_simulation_invokes -= 1
+    current_simulation_invokes = current_simulation_invokes - 1
     #print(hour)
+    print(current_simulation_invokes)
 
 def display_graphs():
 
@@ -588,8 +589,8 @@ def simulate_queue():
                 invoke(lambda: simulate(0, i + 1), delay=i/4)
     simulate_button.text = f"Simulate!"
 
-    while current_simulation_invokes > 5:
-        print(current_simulation_invokes)
+    #while current_simulation_invokes > 5:
+    #    print(current_simulation_invokes)
 
     print("donee!!")
 
