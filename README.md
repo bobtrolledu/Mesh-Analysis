@@ -8,5 +8,10 @@
 - plotting victor
 - animations anson, victor
 - interface victor
+- simulation anson
+- presentation yohanes
+- calculations ethan
+- devpost report yohanes
+- research yohanes, ethan
 
 <img width="1593" alt="Untitled" src="https://github.com/user-attachments/assets/532df263-ab0b-49da-90ae-9c9f38f39ff8">
