@@ -1,6 +1,10 @@
 import heapq
 import matplotlib.pyplot as plt
 from matplotlib import ticker
+import display_plot as DP
+from PIL import Image
+from io import BytesIO
+from ursina import *
 
 end_pointCoords = []
 
@@ -205,5 +209,15 @@ def plot(obstacles, start_coords):
     plt.xlim(-0.5, 20.5)
     plt.ylim(-0.5, 20.5)
     plt.grid(True)
-    plt.show()
+
+    buf = BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+
+    # Convert the image to a texture
+    img = Image.open(buf)
+    texture = Texture(img)
+    buf.close()
+    DP.add_plot(texture)
+
 

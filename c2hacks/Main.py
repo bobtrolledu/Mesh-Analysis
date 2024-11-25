@@ -522,7 +522,7 @@ def display_graphs():
 
     x = []
 
-    for i in range(simulation_length):
+    for i in range(simulation_length*24):
         x.append(i+1)
 
     plt.plot(x, total_energy_use)
