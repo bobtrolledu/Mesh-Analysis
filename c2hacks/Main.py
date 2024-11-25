@@ -68,6 +68,13 @@ previous_mouse_position = Vec2(0, 0)  # Tracks the previous mouse position
 # Variables for the sidebar button
 orthographic_locked = True
 is_animating = False
+<<<<<<< Updated upstream
+=======
+is_simulating = False
+finished_simulating = False
+simulation_length = 7
+current_simulation_invokes = simulation_length * 24
+>>>>>>> Stashed changes
 
 # Grid snapping function
 def snap_to_grid(position, grid_size):
@@ -393,7 +400,7 @@ def calculate_energy_usage():
         elif node.name == "Industrial Building":
             sum += industrial_value
 
-    print(sum)
+    #print(sum)
     return sum
 
 def map_range(x, in_min, in_max, out_min, out_max):
@@ -468,7 +475,7 @@ def update_heatmap(hour):
                 heat_pixel[y][x].position = ((x - 20) / 4, (y  - 20) / 4, -(new_value/100) + 3)
 
 def simulate(bias, hour):
-    global low_value, medium_value, high_value, commercial_value, industrial_value
+    global low_value, medium_value, high_value, commercial_value, industrial_value, current_simulation_invokes
     if bias:
         if low_value > 10:
             low_value -= 10
@@ -495,12 +502,18 @@ def simulate(bias, hour):
     total_energy_use.append(calculate_energy_usage())
     update_power_weights()
     update_heatmap(hour)
+<<<<<<< Updated upstream
+=======
+    current_simulation_invokes -= 1
+    #print(hour)
+>>>>>>> Stashed changes
 
 def display_graphs():
     x =[]
     for i in range(len(total_energy_use)):
         x.append(i + 1)
 
+<<<<<<< Updated upstream
     print(total_energy_use)
     print(x)
     plt.plot(x,total_energy_use)
@@ -508,11 +521,54 @@ def display_graphs():
     #textures =  DP.display()
 
 def simulate_queue():
+=======
+    x = []
+
+    for i in range(simulation_length):
+        x.append(i+1)
+
+    plt.plot(x, total_energy_use)
+    plt.title("Total Energy Use")
+    buf = BytesIO()
+    plt.savefig(buf, format='png', bbox_inches='tight')
+    buf.seek(0)
+
+    # Convert the image to a texture
+    img = Image.open(buf)
+    texture1 = Texture(img)
+    buf.close()
+    DP.add_plot(texture1)
+
+    textures = DP.display()
+
+    real_texture_list = [textures[0], textures[1], textures[-1]]
+
+    global plot_entity_list
+    counter = -1
+    for i in real_texture_list:
+        plot_entity = Entity(
+            parent=camera.ui,
+            model='quad',
+            texture=i,
+            scale=(0.5, 0.5),  # Adjust scale as needed
+            position=(-0.6 * counter, 0, 0),  # Centered
+            visible=False,
+            z=-80
+        )
+        counter += 1
+        plot_entity_list.append(plot_entity)
+
+
+
+def simulate_queue():
+    global is_simulating, heat_pixel, current_simulation_invokes
+>>>>>>> Stashed changes
 
     if not heat_pixel:
         print("No heatmap")
         return
 
+<<<<<<< Updated upstream
     for i in range(24):
         if i > 8 and i < 17:
             invoke(lambda: simulate(1, i + 1), delay=i/4)
@@ -520,6 +576,31 @@ def simulate_queue():
             invoke(lambda: simulate(0, i + 1), delay=i/4)
     simulate_button.text = f"Simulate!"
 
+=======
+    is_simulating = True
+
+    if orthographic_locked:
+        toggle_orthographic()
+
+    if not pipes:
+        analyze_nodes()
+
+    current_simulation_invokes = simulation_length*24
+
+    for i in range (simulation_length):
+        for i in range(24):
+            if i > 8 and i < 17:
+                invoke(lambda: simulate(1, i + 1), delay=i/4)
+            else:
+                invoke(lambda: simulate(0, i + 1), delay=i/4)
+    simulate_button.text = f"Simulate!"
+
+    while current_simulation_invokes > 5:
+        print(current_simulation_invokes)
+
+    print("donee!!")
+
+>>>>>>> Stashed changes
 def enable_wp():
     wp.enabled = True
 
