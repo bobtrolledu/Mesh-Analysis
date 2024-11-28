@@ -18,12 +18,13 @@ As this is a hackathon project, the obvious challenge we ran into is time as we 
 ## Accomplishments that we're proud of
 Some accomplishments that we're most proud of are:
 
-Comprehensive simulation system
-Dynamic heat-map visualizations
-Adaptable energy models
-Seamless integration models
-Engaging animations
-What we learned
+- Comprehensive simulation system
+- Dynamic heat-map visualizations
+- Adaptable energy models
+- Seamless integration models
+- Engaging animations
+  
+## What we learned
 We learned to use 2d and 3d animation with ursina engine, how to use algorithms to path-find, a few of us are also a first-timer python user, and we learned to graph data. The most important thing is to split the workload to reach our goal in the short amount of time we were given.
 
 ## What's next for Mesh Analytics
