@@ -1,6 +1,7 @@
 # Mesh Analytics
+<img width="1593" alt="Untitled" src="https://github.com/user-attachments/assets/532df263-ab0b-49da-90ae-9c9f38f39ff8">
 
-##Inspiration
+## Inspiration
 The inspiration for our project was to create a system that can simulate and generate an energy optimization to cut the excess emission of carbon due to inefficient energy usage in the urban areas as they contribute over 70% of global CO2 emissions largely due to inefficient energy use. (Dasgupta, S., Lall, S., & Wheeler, D. (2024, March 16). Cutting global carbon emissions: where do cities stand? World Bank Blogs. https://blogs.worldbank.org/en/sustainablecities/cutting-global-carbon-emissions-where-do-cities-stand#:~:text=Cities%20account%20for%20over%2070,constructed%20with%20carbon%2Dintensive%20materials.)
 
 ## What it does
@@ -29,5 +30,3 @@ We learned to use 2d and 3d animation with ursina engine, how to use algorithms 
 
 ## What's next for Mesh Analytics
 Our big goal for Mesh Analytics is to bridge the gap between energy management and urban planning.
-
-<img width="1593" alt="Untitled" src="https://github.com/user-attachments/assets/532df263-ab0b-49da-90ae-9c9f38f39ff8">
