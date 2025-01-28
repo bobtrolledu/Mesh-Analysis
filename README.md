@@ -30,3 +30,8 @@ We learned to use 2d and 3d animation with ursina engine, how to use algorithms 
 
 ## What's next for Mesh Analytics
 Our big goal for Mesh Analytics is to bridge the gap between energy management and urban planning.
+
+## Libraries
+Ursina
+Matplotlib
+Numpy
